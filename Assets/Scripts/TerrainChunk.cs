@@ -12,14 +12,6 @@ public class TerrainChunk : MonoBehaviour
     public BlockType[,,] blocks = new BlockType[chunkWidth + 2, chunkHeight, chunkWidth + 2];
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-
-
     public void BuildMesh()
     {
         Mesh mesh = new Mesh();
@@ -127,11 +119,5 @@ public class TerrainChunk : MonoBehaviour
 
         GetComponent<MeshFilter>().mesh = mesh;
         GetComponent<MeshCollider>().sharedMesh = mesh;
-    }
-
-
-    void AddSquare(List<Vector3> verts, List<int> tris)
-    {
-
     }
 }

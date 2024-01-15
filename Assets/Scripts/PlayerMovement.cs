@@ -1,53 +1,35 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 6.0f;
-    public float jumpSpeed = 8.0f;
-    public float gravity = -9.8f;
-    public float jumpHeight = 3f;
-    
-    public Transform groundCheck;
-    public float groundDistance = .4f;
-    public LayerMask groundMask;
+    public float transitionSpeed = 1.0f; // Speed of the transition
+    private bool canMove = true;
+    private Vector3 targetPosition;
+    public float movementDistance = 1.0f; // Fixed movement distance
 
-    private Vector3 velocity;
-    private CharacterController controller;
-    private bool isGrounded;
-
-    // Start is called before the first frame update
     void Start()
     {
-        controller = GetComponent<CharacterController>();
+        targetPosition = transform.position; // Initialize target position
     }
 
-    // Update is called once per frame
     void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if(isGrounded && velocity.y < 0)
+        // Check if the player has reached the target position
+        if (transform.position == targetPosition)
         {
-            velocity.y = -2f;
+            canMove = true;
         }
 
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        Vector3 moveDirection = transform.right * horizontal + transform.forward * vertical;
-
-        controller.Move(moveDirection * speed * Time.deltaTime);
-
-        if(Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetKeyDown(KeyCode.UpArrow) && canMove)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+            // Set the new target position
+            targetPosition = transform.position + Vector3.forward * movementDistance;
+            targetPosition.x = Mathf.Round(targetPosition.x); // Round the x position to ensure it's an integer
+
+            canMove = false;
         }
 
-        velocity.y += gravity * Time.deltaTime;
-        
-        controller.Move(velocity * Time.deltaTime);
+        // Smoothly move the player towards the target position
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, transitionSpeed * Time.deltaTime);
     }
 }

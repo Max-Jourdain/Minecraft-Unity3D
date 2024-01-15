@@ -61,19 +61,19 @@ public class Inventory : MonoBehaviour
             matImgs[curMat].gameObject.SetActive(false);
     }
 
-    public void AddToInventory(BlockType block)
-    {
-        int i = 0;
-        if(block == BlockType.Stone)
-            i = 1;
-        else if(block == BlockType.Trunk)
-            i = 2;
-        else if(block == BlockType.Leaves)
-            i = 3;
+    // public void AddToInventory(BlockType block)
+    // {
+    //     int i = 0;
+    //     if(block == BlockType.Stone)
+    //         i = 1;
+    //     else if(block == BlockType.Trunk)
+    //         i = 2;
+    //     else if(block == BlockType.Leaves)
+    //         i = 3;
 
-        matCounts[i]++;
-        if(matCounts[i] == 1)
-            matImgs[i].gameObject.SetActive(true);
+    //     matCounts[i]++;
+    //     if(matCounts[i] == 1)
+    //         matImgs[i].gameObject.SetActive(true);
 
-    }
+    // }
 }

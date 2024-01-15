@@ -10,11 +10,6 @@ public class TerrainModifier : MonoBehaviour
 
     float maxDist = 4;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -27,6 +22,9 @@ public class TerrainModifier : MonoBehaviour
             if(Physics.Raycast(transform.position, transform.forward, out hitInfo, maxDist, groundLayer))
             {
                 Vector3 pointInTargetBlock;
+                // Debug DrawRay
+                Debug.DrawRay(transform.position, transform.forward * maxDist, Color.red);
+
 
                 //destroy
                 if(rightClick)
@@ -49,7 +47,7 @@ public class TerrainModifier : MonoBehaviour
 
                 if(rightClick)//replace block with air
                 {
-                    inv.AddToInventory(tc.blocks[bix, biy, biz]);
+                    //inv.AddToInventory(tc.blocks[bix, biy, biz]);
                     tc.blocks[bix, biy, biz] = BlockType.Air;
                     tc.BuildMesh();
                 }
