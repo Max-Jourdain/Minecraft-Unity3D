@@ -89,7 +89,7 @@ public class TerrainGenerator : MonoBehaviour
         // Flat zone condition
         if (x >= -4 && x <= 4)
         {
-            if (y <= 30) // Height of the flat zone
+            if (y <= 35) // Height of the flat zone
                 return BlockType.MainSurface; 
             else
                 return BlockType.Air; 
