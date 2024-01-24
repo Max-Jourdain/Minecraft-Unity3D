@@ -106,7 +106,6 @@ public class TerrainChunk : MonoBehaviour
                         {
                             tris.AddRange(new int[] { tl + i * 4, tl + i * 4 + 1, tl + i * 4 + 2, tl + i * 4, tl + i * 4 + 2, tl + i * 4 + 3 });
                             //uvs.AddRange(Block.blocks[BlockType.Grass].topPos.GetUVs());
-
                         }
                     }
                 }

@@ -1,80 +1,35 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Net.Sockets;
 using UnityEngine;
 
 public class TerrainModifier : MonoBehaviour
 {
     public LayerMask groundLayer;
+    public Camera playerCamera; // Assign your player's camera here
+    public float rayLength = 400; // Max distance for raycast
+    public int explosionRadius = 10; // Radius of the explosion
 
-    public Inventory inv;
-
-    float maxDist = 400;
-
-
-
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0)) // Left mouse click
         {
-            Explode(transform.position, 10);
-        }
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-        bool leftClick = Input.GetMouseButtonDown(0);
-        bool rightClick = Input.GetMouseButtonDown(1);
-        if(leftClick || rightClick)
-        {
-            RaycastHit hitInfo;
-            if(Physics.Raycast(transform.position, transform.forward, out hitInfo, maxDist, groundLayer))
+            Debug.DrawRay(ray.origin, ray.direction * rayLength, Color.red, 1f);
+
+            if (Physics.Raycast(ray, out hit, rayLength, groundLayer))
             {
-                Vector3 pointInTargetBlock;
-                // Debug DrawRay
-                Debug.DrawRay(transform.position, transform.forward * maxDist, Color.red);
-
-
-                //destroy
-                if(rightClick)
-                    pointInTargetBlock = hitInfo.point + transform.forward * .01f;//move a little inside the block
-                else
-                    pointInTargetBlock = hitInfo.point - transform.forward * .01f;
-
-                //get the terrain chunk (can't just use collider)
-                int chunkPosX = Mathf.FloorToInt(pointInTargetBlock.x / 16f) * 16;
-                int chunkPosZ = Mathf.FloorToInt(pointInTargetBlock.z / 16f) * 16;
-
-                ChunkPos cp = new ChunkPos(chunkPosX, chunkPosZ);
-
-                TerrainChunk tc = TerrainGenerator.chunks[cp];
-
-                //index of the target block
-                int bix = Mathf.FloorToInt(pointInTargetBlock.x) - chunkPosX+1;
-                int biy = Mathf.FloorToInt(pointInTargetBlock.y);
-                int biz = Mathf.FloorToInt(pointInTargetBlock.z) - chunkPosZ+1;
-
-                if(rightClick)//replace block with air
-                {
-                    //inv.AddToInventory(tc.blocks[bix, biy, biz]);
-                    tc.blocks[bix, biy, biz] = BlockType.Air;
-                    tc.BuildMesh();
-                }
-                else if(leftClick)
-                {
-                    if(inv.CanPlaceCur())
-                    {
-                        tc.blocks[bix, biy, biz] = inv.GetCurBlock();
-
-                        tc.BuildMesh();
-
-                        inv.ReduceCur();
-                    }
-                    
-                }
+                Explode(hit.point, explosionRadius);
             }
         }
     }
 
+
     public void Explode(Vector3 explosionCenter, int explosionRadius)
     {
+        HashSet<ChunkPos> affectedChunks = new HashSet<ChunkPos>();
+
         // Iterate over a cubic region around the explosion center
         for (int x = -explosionRadius; x <= explosionRadius; x++)
         {
@@ -99,24 +54,25 @@ public class TerrainModifier : MonoBehaviour
                             int biy = Mathf.FloorToInt(blockPosition.y);
                             int biz = Mathf.FloorToInt(blockPosition.z) - chunkPosZ + 1;
 
-                            // Check if the coordinates are within bounds
-                            if (bix >= 0 && bix < 16 && biy >= 0 && biy < 256 && biz >= 0 && biz < 16)
-                            {
-                                // Replace the block with air
+                            if (bix >= 0 && bix <= 16 && biy >= 0 && biy < 256 && biz >= 0 && biz <= 16)
+                            {           
                                 tc.blocks[bix, biy, biz] = BlockType.Air;
-
-                                // Optionally, add some logic here to handle different types of blocks differently
+                                affectedChunks.Add(cp);
                             }
+
                         }
                     }
                 }
             }
         }
 
-        // Rebuild the affected chunks' meshes
-        foreach (var chunk in TerrainGenerator.chunks.Values)
+        foreach (var chunkPos in affectedChunks)
         {
-            chunk.BuildMesh();
+            if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk affectedChunk))
+            {
+                affectedChunk.BuildMesh();
+                Debug.DrawLine(explosionCenter, affectedChunk.transform.position, Color.red, 100f);
+            }
         }
     }
 }
