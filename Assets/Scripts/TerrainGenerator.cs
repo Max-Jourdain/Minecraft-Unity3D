@@ -74,25 +74,31 @@ public class TerrainGenerator : MonoBehaviour
 
     BlockType GetBlockType(int x, int y, int z)
     {
+        // Base noise for the terrain
         float simplex1 = noise.GetSimplex(x * 0.8f, z * 0.8f) * 10;
         float simplex2 = noise.GetSimplex(x * 3f, z * 3f) * 10 * (noise.GetSimplex(x * 0.3f, z * 0.3f) + 0.5f);
 
-        float heightMap = simplex1 + simplex2;
+        // Determine the distance from the strip
+        float distanceFromStrip = Mathf.Max(0, Mathf.Abs(x) - 4);
+        // Scale factor for noise (increases with distance from strip)
+        float noiseScaleFactor = Mathf.Clamp(distanceFromStrip / 10f, 0, 1); // Adjust the divisor for more/less sensitivity
+
+        // Apply scaled noise
+        float heightMap = (simplex1 + simplex2) * noiseScaleFactor;
 
         // Flat zone condition
         if (x >= -4 && x <= 4)
         {
-            if (y <= 30) // 30 is the height of the flat zone
+            if (y <= 30) // Height of the flat zone
                 return BlockType.MainSurface; 
             else
                 return BlockType.Air; 
         }
 
         // Parabolic elevation effect outside the flat zone
-        float distanceFromFlatZone = Mathf.Abs(x) - 4; // Distance from the edge of the flat zone
-        float elevationEffect = distanceFromFlatZone * distanceFromFlatZone * 0.008f; // Parabolic effect; adjust 0.1f for more/less steepness
+        float elevationEffect = distanceFromStrip * distanceFromStrip * 0.025f; // Parabolic effect
 
-        // Combine with noise
+        // Combine parabolic elevation with noise
         float baseLandHeight = TerrainChunk.chunkHeight * 0.5f + heightMap + elevationEffect;
 
         float noiseValue = noise.GetSimplex(x * colorFrequency, z * colorFrequency);
