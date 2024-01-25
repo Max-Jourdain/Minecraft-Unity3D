@@ -13,8 +13,8 @@ public class TerrainGenerator : MonoBehaviour
 
     FastNoise noise = new FastNoise();
 
-    int chunkDistX = 5; // Distance of chunks to load in X direction
-    int chunkDistZ = 7; // Distance of chunks to load in Z direction
+    int chunkDistX = 3; // Distance of chunks to load in X direction
+    int chunkDistZ = 6; // Distance of chunks to load in Z direction
 
     List<TerrainChunk> pooledChunks = new List<TerrainChunk>();
 
@@ -79,7 +79,7 @@ public class TerrainGenerator : MonoBehaviour
         // Flat zone condition
         if (x >= -4 && x <= 4)
         {
-            if (y <= 31) // Height of the flat zone
+            if (y <= 32) // Height of the flat zone
                 return BlockType.MainSurface; 
             else
                 return BlockType.Air; 
@@ -118,9 +118,8 @@ public class TerrainGenerator : MonoBehaviour
             return BlockType.Color5; // New color zone
     }
 
-
-
     ChunkPos curChunk = new ChunkPos(-1,-1);
+    
     void LoadChunks(bool instant = false)
     {
         //the current chunk the player is in
@@ -207,7 +206,7 @@ public class TerrainGenerator : MonoBehaviour
     //             for(int j = 0; j < treeHeight; j++)
     //             {
     //                 if(y+j < 64)
-    //                     blocks[xPos, y+j, zPos] = BlockType.Trunk;
+    //                     blocks[xPos, y+j, zPos] = BlockType.MainSurface;
     //             }
 
     //             int leavesWidth = 1 + (int)(rand.NextDouble() * 6);
@@ -220,13 +219,11 @@ public class TerrainGenerator : MonoBehaviour
     //                     for(int l = zPos - (int)(leavesWidth * .5)+iter/2; l <= zPos + (int)(leavesWidth * .5)-iter/2; l++)
     //                     {
     //                         if(k >= 0 && k < 16 && l >= 0 && l < 16 && m >= 0 && m < 64 && rand.NextDouble() < .8f)
-    //                             blocks[k, m, l] = BlockType.Leaves;
+    //                             blocks[k, m, l] = BlockType.MainSurface;
     //                     }
 
     //                 iter++;
     //             }
-
-
     //         }
     //     }
     // }
