@@ -1148,7 +1148,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
-  inv: {fileID: 846005836}
+  playerCamera: {fileID: 963194227}
+  rayLength: 400
+  explosionRadius: 4
 --- !u!114 &963194231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1240,8 +1242,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd1e459f7ed4910449eb05e0a6c6aa30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  transitionSpeed: 3
-  movementDistance: 1
+  transitionSpeed: 20
+  movementDistance: 20
 --- !u!23 &1100592806
 MeshRenderer:
   m_ObjectHideFlags: 0

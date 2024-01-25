@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net.Sockets;
 using UnityEngine;
 
 public class TerrainModifier : MonoBehaviour
@@ -25,12 +24,10 @@ public class TerrainModifier : MonoBehaviour
         }
     }
 
-
     public void Explode(Vector3 explosionCenter, int explosionRadius)
     {
         HashSet<ChunkPos> affectedChunks = new HashSet<ChunkPos>();
 
-        // Iterate over a cubic region around the explosion center
         for (int x = -explosionRadius; x <= explosionRadius; x++)
         {
             for (int y = -explosionRadius; y <= explosionRadius; y++)
@@ -40,38 +37,43 @@ public class TerrainModifier : MonoBehaviour
                     Vector3 explosionOffset = new Vector3(x, y, z);
                     Vector3 blockPosition = explosionCenter + explosionOffset;
 
-                    // Check if this block is within the explosion radius
                     if (explosionOffset.magnitude <= explosionRadius)
                     {
-                        // Convert blockPosition to chunk coordinates and block index
-                        int chunkPosX = Mathf.FloorToInt(blockPosition.x / 16f) * 16;
-                        int chunkPosZ = Mathf.FloorToInt(blockPosition.z / 16f) * 16;
+                        int globalX = Mathf.FloorToInt(blockPosition.x);
+                        int globalY = Mathf.FloorToInt(blockPosition.y);
+                        int globalZ = Mathf.FloorToInt(blockPosition.z);
+
+                        int chunkPosX = Mathf.FloorToInt(globalX / 16f) * 16;
+                        int chunkPosZ = Mathf.FloorToInt(globalZ / 16f) * 16;
                         ChunkPos cp = new ChunkPos(chunkPosX, chunkPosZ);
 
                         if (TerrainGenerator.chunks.TryGetValue(cp, out TerrainChunk tc))
                         {
-                            int bix = Mathf.FloorToInt(blockPosition.x) - chunkPosX + 1;
-                            int biy = Mathf.FloorToInt(blockPosition.y);
-                            int biz = Mathf.FloorToInt(blockPosition.z) - chunkPosZ + 1;
+                            int bix = globalX - chunkPosX + 1;
+                            int biy = globalY;
+                            int biz = globalZ - chunkPosZ + 1;
 
-                            if (bix >= 0 && bix <= 16 && biy >= 0 && biy < 256 && biz >= 0 && biz <= 16)
-                            {           
-                                tc.blocks[bix, biy, biz] = BlockType.Air;
-                                affectedChunks.Add(cp);
+                            tc.blocks[bix, biy, biz] = BlockType.Air;
+                            affectedChunks.Add(cp);
+
+
+                            // Check if on the edge of a chunk
+                            if (bix == 16 || biz == 16)
+                            {
+                                Debug.DrawRay(blockPosition, Vector3.up, Color.red, 100f);
                             }
-
                         }
                     }
                 }
             }
         }
 
+        // Rebuild meshes for all affected chunks
         foreach (var chunkPos in affectedChunks)
         {
             if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk affectedChunk))
             {
                 affectedChunk.BuildMesh();
-                Debug.DrawLine(explosionCenter, affectedChunk.transform.position, Color.red, 100f);
             }
         }
     }
