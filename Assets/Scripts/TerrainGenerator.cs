@@ -7,7 +7,7 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject terrainChunk;
 
     public Transform player;
-    [Range(0.1f, 10f)][SerializeField] private float colorFrequency = 2f;
+    [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
 
     public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
 
@@ -20,7 +20,6 @@ public class TerrainGenerator : MonoBehaviour
 
     List<ChunkPos> toGenerate = new List<ChunkPos>();
 
-    // Start is called before the first frame update
     void Start()
     {
         LoadChunks(true);
@@ -46,13 +45,11 @@ public class TerrainGenerator : MonoBehaviour
             GameObject chunkGO = Instantiate(terrainChunk, new Vector3(xPos, 0, zPos), Quaternion.identity);
             chunk = chunkGO.GetComponent<TerrainChunk>();
         }
-        
 
         for(int x = 0; x < TerrainChunk.chunkWidth+2; x++)
             for(int z = 0; z < TerrainChunk.chunkWidth+2; z++)
                 for(int y = 0; y < TerrainChunk.chunkHeight; y++)
                 {
-                    // if(Mathf.PerlinNoise((xPos + x-1) * .1f, (zPos + z-1) * .1f) * 10 + y < TerrainChunk.chunkHeight * .5f)
                     chunk.blocks[x, y, z] = GetBlockType(xPos+x-1, y, zPos+z-1);
                 }
 
@@ -61,13 +58,6 @@ public class TerrainGenerator : MonoBehaviour
 
         chunk.BuildMesh();
 
-
-        // WaterChunk wat = chunk.transform.GetComponentInChildren<WaterChunk>();
-        // wat.SetLocs(chunk.blocks);
-        // wat.BuildMesh();
-        
-
-
         chunks.Add(new ChunkPos(xPos, zPos), chunk);
     }
 
@@ -75,11 +65,11 @@ public class TerrainGenerator : MonoBehaviour
     BlockType GetBlockType(int x, int y, int z)
     {
         // Base noise for the terrain
-        float simplex1 = noise.GetSimplex(x * 0.8f, z * 0.8f) * 10;
-        float simplex2 = noise.GetSimplex(x * 3f, z * 3f) * 10 * (noise.GetSimplex(x * 0.3f, z * 0.3f) + 0.5f);
+        float simplex1 = noise.GetSimplex(x * 0.8f, z * 0.8f) * 5;
+        float simplex2 = noise.GetSimplex(x * 3f, z * 3f) * 5 * (noise.GetSimplex(x * 0.3f, z * 0.3f) + 0.5f);
 
         // Determine the distance from the strip
-        float distanceFromStrip = Mathf.Max(0, Mathf.Abs(x) - 4);
+        float distanceFromStrip = Mathf.Max(0, Mathf.Abs(x) - 5);
         // Scale factor for noise (increases with distance from strip)
         float noiseScaleFactor = Mathf.Clamp(distanceFromStrip / 10f, 0, 1); // Adjust the divisor for more/less sensitivity
 
@@ -89,7 +79,7 @@ public class TerrainGenerator : MonoBehaviour
         // Flat zone condition
         if (x >= -4 && x <= 4)
         {
-            if (y <= 35) // Height of the flat zone
+            if (y <= 31) // Height of the flat zone
                 return BlockType.MainSurface; 
             else
                 return BlockType.Air; 

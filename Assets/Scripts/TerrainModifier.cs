@@ -49,26 +49,18 @@ public class TerrainModifier : MonoBehaviour
 
                         if (TerrainGenerator.chunks.TryGetValue(cp, out TerrainChunk tc))
                         {
-                            int bix = globalX - chunkPosX + 1;
+                            int bix = globalX - chunkPosX;
                             int biy = globalY;
-                            int biz = globalZ - chunkPosZ + 1;
+                            int biz = globalZ - chunkPosZ;
 
                             tc.blocks[bix, biy, biz] = BlockType.Air;
                             affectedChunks.Add(cp);
-
-
-                            // Check if on the edge of a chunk
-                            if (bix == 16 || biz == 16)
-                            {
-                                Debug.DrawRay(blockPosition, Vector3.up, Color.red, 100f);
-                            }
                         }
                     }
                 }
             }
         }
 
-        // Rebuild meshes for all affected chunks
         foreach (var chunkPos in affectedChunks)
         {
             if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk affectedChunk))
