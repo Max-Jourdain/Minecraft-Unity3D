@@ -7,6 +7,7 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject terrainChunk;
 
     public Transform player;
+    public static int stripSize = 8;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
 
     public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
@@ -69,20 +70,24 @@ public class TerrainGenerator : MonoBehaviour
         float simplex2 = noise.GetSimplex(x * 3f, z * 3f) * 5 * (noise.GetSimplex(x * 0.3f, z * 0.3f) + 0.5f);
 
         // Determine the distance from the strip
-        float distanceFromStrip = Mathf.Max(0, Mathf.Abs(x) - 5);
+        float distanceFromStrip = Mathf.Max(0, Mathf.Abs(x) - 6);
         // Scale factor for noise (increases with distance from strip)
         float noiseScaleFactor = Mathf.Clamp(distanceFromStrip / 10f, 0, 1); // Adjust the divisor for more/less sensitivity
 
         // Apply scaled noise
         float heightMap = (simplex1 + simplex2) * noiseScaleFactor;
 
-        // Flat zone condition
-        if (x >= -4 && x <= 4)
+        int halfStripSize = stripSize / 2;
+        if (x >= -halfStripSize && x <= halfStripSize)
         {
-            if (y <= 32) // Height of the flat zone
-                return BlockType.MainSurface; 
+            if (y <= 31)
+            {
+                return BlockType.MainSurface;
+            }
             else
-                return BlockType.Air; 
+            {
+                return BlockType.Air;
+            }
         }
 
         // Parabolic elevation effect outside the flat zone

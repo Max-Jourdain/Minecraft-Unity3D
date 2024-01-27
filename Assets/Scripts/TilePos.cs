@@ -30,13 +30,20 @@ public class TilePos
     public static Dictionary<Tile, TilePos> tiles = new Dictionary<Tile, TilePos>()
     {
         {Tile.MainSurface, new TilePos(0, 0)},
-        {Tile.Color1, new TilePos(0, 1)},
-        {Tile.Color2, new TilePos(0, 2)},
-        {Tile.Color3, new TilePos(0, 3)},
-        {Tile.Color4, new TilePos(0, 4)},
-        {Tile.Color5, new TilePos(0, 5)},
+        {Tile.Num1, new TilePos(0, 1)},
+        {Tile.Num2, new TilePos(0, 2)},
+        {Tile.Color1, new TilePos(1, 0)},
+        {Tile.Color2, new TilePos(1, 1)},
+        {Tile.Color3, new TilePos(1, 2)},
+        {Tile.Color4, new TilePos(1, 3)},
+        {Tile.Color5, new TilePos(1, 4)},
 
     };
 }
 
-public enum Tile { MainSurface, Color1, Color2, Color3, Color4, Color5 }
+public enum Tile 
+{ 
+    MainSurface,
+    Num1, Num2,
+    Color1, Color2, Color3, Color4, Color5 
+}

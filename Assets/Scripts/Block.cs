@@ -30,8 +30,11 @@ public class Block
     }
 
 
-    public static Dictionary<BlockType, Block> blocks = new Dictionary<BlockType, Block>(){
+    public static Dictionary<BlockType, Block> blocks = new Dictionary<BlockType, Block>()
+    {
         {BlockType.MainSurface, new Block(Tile.MainSurface, Tile.MainSurface, Tile.MainSurface)},
+        {BlockType.Num1, new Block(Tile.Num1, Tile.Num1, Tile.Num1)},
+        {BlockType.Num2, new Block(Tile.Num2, Tile.Num2, Tile.Num2)},
         {BlockType.Color1, new Block(Tile.Color1, Tile.Color1, Tile.Color1)},
         {BlockType.Color2, new Block(Tile.Color2, Tile.Color2, Tile.Color2)},
         {BlockType.Color3, new Block(Tile.Color3, Tile.Color3, Tile.Color3)},
@@ -40,4 +43,10 @@ public class Block
     };
 }
 
-public enum BlockType {Air, MainSurface, Color1, Color2, Color3, Color4, Color5}
+public enum BlockType 
+{
+    Air, 
+    MainSurface, 
+    Num1, Num2, 
+    Color1, Color2, Color3, Color4, Color5
+}
