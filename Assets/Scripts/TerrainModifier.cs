@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class TerrainModifier : MonoBehaviour
 {
@@ -80,15 +81,42 @@ public class TerrainModifier : MonoBehaviour
         int localX = blockPos.x - chunkPos.x + 1;
         int localZ = blockPos.z - chunkPos.z + 1;
 
-        if (chunk.blocks[localX, blockPos.y, localZ] != BlockType.Air)
-        {
-            chunk.blocks[localX, blockPos.y - 1, localZ] = selectedColor; // Use selected color
-        }
-        else
-        {
-            chunk.blocks[localX, blockPos.y - 1, localZ] = selectedColor; // Use selected color
-        }
-
+        // Update the block in the current chunk
+        chunk.blocks[localX, blockPos.y - 1, localZ] = selectedColor;
         chunk.BuildMesh();
+
+        //! Working explosin check AND Update the block in the adjacent chunk
+        if (localX == 1)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x - TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
+            {
+                adjacentChunk.blocks[TerrainChunk.chunkWidth + 1, blockPos.y - 1, localZ] = selectedColor;
+                adjacentChunk.BuildMesh();
+            }
+        }
+        else if (localX == TerrainChunk.chunkWidth)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x + TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
+            {
+                adjacentChunk.blocks[0, blockPos.y - 1, localZ] = selectedColor;
+                adjacentChunk.BuildMesh();
+            }
+        }
+        if (localZ == 1)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z - TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
+            {
+                adjacentChunk.blocks[localX, blockPos.y - 1, TerrainChunk.chunkWidth + 1] = selectedColor;
+                adjacentChunk.BuildMesh();
+            }
+        }
+        else if (localZ == TerrainChunk.chunkWidth)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z + TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
+            {
+                adjacentChunk.blocks[localX, blockPos.y - 1, 0] = selectedColor;
+                adjacentChunk.BuildMesh();
+            }
+        }
     }
 }
