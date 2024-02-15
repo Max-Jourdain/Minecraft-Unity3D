@@ -33,6 +33,7 @@ public class Block
     public static Dictionary<BlockType, Block> blocks = new Dictionary<BlockType, Block>()
     {
         {BlockType.MainSurface, new Block(Tile.MainSurface, Tile.MainSurface, Tile.MainSurface)},
+        {BlockType.Mine, new Block(Tile.Color1, Tile.MainSurface, Tile.MainSurface)},
         {BlockType.Num1, new Block(Tile.Num1, Tile.MainSurface, Tile.MainSurface)},
         {BlockType.Num2, new Block(Tile.Num2, Tile.MainSurface, Tile.MainSurface)},
         {BlockType.Color1, new Block(Tile.Color1, Tile.Color1, Tile.Color1)},
@@ -46,7 +47,8 @@ public class Block
 public enum BlockType 
 {
     Air, 
-    MainSurface, 
+    MainSurface,
+    Mine,
     Num1, Num2, 
     Color1, Color2, Color3, Color4, Color5
 }

@@ -7,10 +7,7 @@ public class TerrainChunk : MonoBehaviour
     //chunk size
     public const int chunkWidth = 16;
     public const int chunkHeight = 64;
-
-    //0 = air, 1 = land
     public BlockType[,,] blocks = new BlockType[chunkWidth + 2, chunkHeight, chunkWidth + 2];
-
 
     public void BuildMesh()
     {

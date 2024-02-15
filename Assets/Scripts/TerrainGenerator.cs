@@ -5,20 +5,16 @@ using UnityEngine;
 public class TerrainGenerator : MonoBehaviour
 {
     public GameObject terrainChunk;
-
     public Transform player;
     public static int stripSize = 8;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
-
+    [Range(0f, 1f)][SerializeField] private float mineProbability = 0.1f; 
     public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
-
     FastNoise noise = new FastNoise();
-
-    int chunkDistX = 3; // Distance of chunks to load in X direction
-    int chunkDistZ = 6; // Distance of chunks to load in Z direction
-
+    int chunkDistX = 3; 
+    int chunkDistZ = 6; 
+    ChunkPos curChunk = new ChunkPos(-1,-1);
     List<TerrainChunk> pooledChunks = new List<TerrainChunk>();
-
     List<ChunkPos> toGenerate = new List<ChunkPos>();
 
     void Start()
@@ -34,7 +30,7 @@ public class TerrainGenerator : MonoBehaviour
     void BuildChunk(int xPos, int zPos)
     {
         TerrainChunk chunk;
-        if(pooledChunks.Count > 0)//look in the poo first
+        if(pooledChunks.Count > 0) // Look in the pool first
         {
             chunk = pooledChunks[0];
             chunk.gameObject.SetActive(true);
@@ -54,14 +50,9 @@ public class TerrainGenerator : MonoBehaviour
                     chunk.blocks[x, y, z] = GetBlockType(xPos+x-1, y, zPos+z-1);
                 }
 
-
-        // GenerateTrees(chunk.blocks, xPos, zPos);
-
         chunk.BuildMesh();
-
         chunks.Add(new ChunkPos(xPos, zPos), chunk);
     }
-
 
     BlockType GetBlockType(int x, int y, int z)
     {
@@ -80,19 +71,19 @@ public class TerrainGenerator : MonoBehaviour
         int halfStripSize = stripSize / 2;
         if (x >= -halfStripSize && x <= halfStripSize)
         {
-            if (y == 31)
+            // Decide if the current block is a mine based on probability
+            if (y == 31 && Random.value < mineProbability) // Assuming mines are placed at the surface level for simplicity
+            {
+                return BlockType.Mine; // Assuming BlockType.Mine exists
+            }
+            else if (y == 31)
             {
                 return BlockType.MainSurface;
             }
-            else if (y < 31)
-            {
-                return BlockType.Color1;
-            }
-            else
-            {
-                return BlockType.Air;
-            }
+            else if (y < 31) return BlockType.Color1;
+            else return BlockType.Air;
         }
+
 
         // Parabolic elevation effect outside the flat zone
         float elevationEffect = distanceFromStrip * distanceFromStrip * 0.025f; // Parabolic effect
@@ -114,26 +105,18 @@ public class TerrainGenerator : MonoBehaviour
 
     BlockType GetColorBasedBlockType(float noiseValue)
     {
-        // Extended range for new color zone
-        if (noiseValue < -0.6)
-            return BlockType.Color1;
-        else if (noiseValue < -0.2)
-            return BlockType.Color2;
-        else if (noiseValue < 0.2)
-            return BlockType.Color3;
-        else if (noiseValue < 0.6)
-            return BlockType.Color4;
-        else
-            return BlockType.Color5; // New color zone
+        if (noiseValue < -0.6) return BlockType.Color1;
+        else if (noiseValue < -0.2) return BlockType.Color2;
+        else if (noiseValue < 0.2) return BlockType.Color3;
+        else if (noiseValue < 0.6) return BlockType.Color4;
+        else return BlockType.Color5;
     }
-
-    ChunkPos curChunk = new ChunkPos(-1,-1);
     
     void LoadChunks(bool instant = false)
     {
         //the current chunk the player is in
-        int curChunkPosX = Mathf.FloorToInt(player.position.x/16)*16;
-        int curChunkPosZ = Mathf.FloorToInt(player.position.z/16)*16;
+        int curChunkPosX = Mathf.FloorToInt(player.position.x / 16 ) * 16;
+        int curChunkPosZ = Mathf.FloorToInt(player.position.z / 16 ) * 16;
 
         //entered a new chunk
         if(curChunk.x != curChunkPosX || curChunk.z != curChunkPosZ)
@@ -141,23 +124,22 @@ public class TerrainGenerator : MonoBehaviour
             curChunk.x = curChunkPosX;
             curChunk.z = curChunkPosZ;
 
-
-        // Adjust the for loop to use the new chunkDistX and chunkDistZ
+            // Adjust the for loop to use the new chunkDistX and chunkDistZ
             for(int i = curChunkPosX - 16 * chunkDistX; i <= curChunkPosX + 16 * chunkDistX; i += 16)
+            {
                 for(int j = curChunkPosZ - 16 * chunkDistZ; j <= curChunkPosZ + 16 * chunkDistZ; j += 16)
                 {
                     ChunkPos cp = new ChunkPos(i, j);
 
                     if(!chunks.ContainsKey(cp) && !toGenerate.Contains(cp))
                     {
-                        if(instant)
-                            BuildChunk(i, j);
-                        else
-                            toGenerate.Add(cp);
+                        if(instant) BuildChunk(i, j);
+                        else toGenerate.Add(cp);
                     }
                 }
+            }
 
-            //remove chunks that are too far away
+            // Remove chunks that are too far away
             List<ChunkPos> toDestroy = new List<ChunkPos>();
             foreach (KeyValuePair<ChunkPos, TerrainChunk> c in chunks)
             {
@@ -168,7 +150,6 @@ public class TerrainGenerator : MonoBehaviour
                 }
             }
 
-            //remove any up for generation
             foreach(ChunkPos cp in toGenerate)
             {
                 if(Mathf.Abs(curChunkPosX - cp.x) > 16 * (chunkDistX + 3) || Mathf.Abs(curChunkPosZ - cp.z) > 16 * (chunkDistZ + 3))
@@ -185,57 +166,6 @@ public class TerrainGenerator : MonoBehaviour
             StartCoroutine(DelayBuildChunks());
         }
     }
-
-    // void GenerateTrees(BlockType[,,] blocks, int x, int z)
-    // {
-    //     System.Random rand = new System.Random(x * 10000 + z);
-
-    //     float simplex = noise.GetSimplex(x * .8f, z * .8f);
-
-    //     if(simplex > 0)
-    //     {
-    //         simplex *= 2f;
-    //         int treeCount = Mathf.FloorToInt((float)rand.NextDouble() * 5 * simplex);
-
-    //         for(int i = 0; i < treeCount; i++)
-    //         {
-    //             int xPos = (int)(rand.NextDouble() * 14) + 1;
-    //             int zPos = (int)(rand.NextDouble() * 14) + 1;
-
-    //             int y = TerrainChunk.chunkHeight - 1;
-    //             //find the ground
-    //             while(y > 0 && blocks[xPos, y, zPos] == BlockType.Air)
-    //             {
-    //                 y--;
-    //             }
-    //             y++;
-
-    //             int treeHeight = 4 + (int)(rand.NextDouble() * 4);
-
-    //             for(int j = 0; j < treeHeight; j++)
-    //             {
-    //                 if(y+j < 64)
-    //                     blocks[xPos, y+j, zPos] = BlockType.MainSurface;
-    //             }
-
-    //             int leavesWidth = 1 + (int)(rand.NextDouble() * 6);
-    //             int leavesHeight = (int)(rand.NextDouble() * 3);
-
-    //             int iter = 0;
-    //             for(int m = y + treeHeight - 1; m <= y + treeHeight - 1 + treeHeight; m++)
-    //             {
-    //                 for(int k = xPos - (int)(leavesWidth * .5)+iter/2; k <= xPos + (int)(leavesWidth * .5)-iter/2; k++)
-    //                     for(int l = zPos - (int)(leavesWidth * .5)+iter/2; l <= zPos + (int)(leavesWidth * .5)-iter/2; l++)
-    //                     {
-    //                         if(k >= 0 && k < 16 && l >= 0 && l < 16 && m >= 0 && m < 64 && rand.NextDouble() < .8f)
-    //                             blocks[k, m, l] = BlockType.MainSurface;
-    //                     }
-
-    //                 iter++;
-    //             }
-    //         }
-    //     }
-    // }
 
     IEnumerator DelayBuildChunks()
     {

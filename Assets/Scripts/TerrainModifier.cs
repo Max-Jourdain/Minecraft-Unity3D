@@ -7,12 +7,10 @@ public class TerrainModifier : MonoBehaviour
     public Camera playerCamera;
     public float rayLength = 400;
 
-    private BlockType selectedColor = BlockType.Color1; // Default color
+    private BlockType selectedColor = BlockType.Color5; // Default color
 
     void Update()
     {
-        CheckForColorChangeInput(); // Check if a number key is pressed
-
         if (Input.GetMouseButtonDown(0)) // Left mouse click
         {
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
@@ -21,15 +19,6 @@ public class TerrainModifier : MonoBehaviour
                 ProcessHit(hit.point);
             }
         }
-    }
-
-    private void CheckForColorChangeInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) selectedColor = BlockType.Num1;
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) selectedColor = BlockType.Num2;
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) selectedColor = BlockType.Air;
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) selectedColor = BlockType.Color4;
-        else if (Input.GetKeyDown(KeyCode.Alpha5)) selectedColor = BlockType.Color5;
     }
 
     private void ProcessHit(Vector3 hitPoint)
@@ -45,7 +34,16 @@ public class TerrainModifier : MonoBehaviour
             ChunkPos chunkPos = GetChunkPosition(blockPos);
             if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
             {
-                UpdateChunkBlock(chunk, blockPos, chunkPos);
+                // ! Game Over if the block is a mine
+                if (chunk.blocks[blockPos.x - chunkPos.x + 1, blockPos.y - 1, blockPos.z - chunkPos.z + 1] == BlockType.Mine)
+                {
+                    Debug.Log("Game Over");
+                }
+                else
+                {
+                    CountSurroundingMines(blockPos, chunk, chunkPos);
+                    UpdateChunkBlock(chunk, blockPos, chunkPos);
+                }
             }
             else
             {
@@ -53,6 +51,7 @@ public class TerrainModifier : MonoBehaviour
             }
         }
     }
+
     private Vector3Int ConvertToBlockPosition(Vector3 hitPoint)
     {
         return new Vector3Int(
@@ -63,7 +62,7 @@ public class TerrainModifier : MonoBehaviour
 
     private bool IsWithinStripBounds(int x)
     {
-        int halfStripSize = TerrainGenerator.stripSize / 2;
+        int halfStripSize = 8 / 2;
         return x >= -halfStripSize && x <= halfStripSize;
     }
 
@@ -82,39 +81,34 @@ public class TerrainModifier : MonoBehaviour
         // Update the block in the current chunk
         chunk.blocks[localX, blockPos.y - 1, localZ] = selectedColor;
         chunk.BuildMesh();
+    }
 
-        //! Working explosin check AND Update the block in the adjacent chunk
-        if (localX == 1)
+    private int CountSurroundingMines(Vector3Int blockPos, TerrainChunk chunk, ChunkPos chunkPos)
+    {
+        int mineCount = 0;
+        // Iterate through a 3x3 grid centered on the clicked block
+        for (int x = -1; x <= 1; x++)
         {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x - TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
+            for (int z = -1; z <= 1; z++)
             {
-                adjacentChunk.blocks[TerrainChunk.chunkWidth + 1, blockPos.y - 1, localZ] = selectedColor;
-                adjacentChunk.BuildMesh();
+                if (x == 0 && z == 0) continue; // Skip the clicked block itself
+
+                int neighborX = blockPos.x + x - chunkPos.x + 1;
+                int neighborZ = blockPos.z + z - chunkPos.z + 1;
+
+                // Check if the neighbor is within chunk bounds
+                if (neighborX >= 0 && neighborX < TerrainChunk.chunkWidth && neighborZ >= 0 && neighborZ < TerrainChunk.chunkWidth)
+                {
+                    // Check if the neighboring block is a mine
+                    if (chunk.blocks[neighborX, blockPos.y - 1, neighborZ] == BlockType.Mine)
+                    {
+                        mineCount++;
+                    }
+                }
             }
         }
-        else if (localX == TerrainChunk.chunkWidth)
-        {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x + TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
-            {
-                adjacentChunk.blocks[0, blockPos.y - 1, localZ] = selectedColor;
-                adjacentChunk.BuildMesh();
-            }
-        }
-        if (localZ == 1)
-        {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z - TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
-            {
-                adjacentChunk.blocks[localX, blockPos.y - 1, TerrainChunk.chunkWidth + 1] = selectedColor;
-                adjacentChunk.BuildMesh();
-            }
-        }
-        else if (localZ == TerrainChunk.chunkWidth)
-        {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z + TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
-            {
-                adjacentChunk.blocks[localX, blockPos.y - 1, 0] = selectedColor;
-                adjacentChunk.BuildMesh();
-            }
-        }
+
+        Debug.Log($"Mine count: {mineCount}");
+        return mineCount;
     }
 }
