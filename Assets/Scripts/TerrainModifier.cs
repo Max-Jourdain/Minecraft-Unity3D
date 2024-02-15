@@ -27,7 +27,7 @@ public class TerrainModifier : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) selectedColor = BlockType.Num1;
         else if (Input.GetKeyDown(KeyCode.Alpha2)) selectedColor = BlockType.Num2;
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) selectedColor = BlockType.Color3;
+        else if (Input.GetKeyDown(KeyCode.Alpha3)) selectedColor = BlockType.Air;
         else if (Input.GetKeyDown(KeyCode.Alpha4)) selectedColor = BlockType.Color4;
         else if (Input.GetKeyDown(KeyCode.Alpha5)) selectedColor = BlockType.Color5;
     }
@@ -53,8 +53,6 @@ public class TerrainModifier : MonoBehaviour
             }
         }
     }
-
-
     private Vector3Int ConvertToBlockPosition(Vector3 hitPoint)
     {
         return new Vector3Int(

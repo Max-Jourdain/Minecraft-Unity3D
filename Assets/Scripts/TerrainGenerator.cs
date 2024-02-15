@@ -80,9 +80,13 @@ public class TerrainGenerator : MonoBehaviour
         int halfStripSize = stripSize / 2;
         if (x >= -halfStripSize && x <= halfStripSize)
         {
-            if (y <= 31)
+            if (y == 31)
             {
                 return BlockType.MainSurface;
+            }
+            else if (y < 31)
+            {
+                return BlockType.Color1;
             }
             else
             {
