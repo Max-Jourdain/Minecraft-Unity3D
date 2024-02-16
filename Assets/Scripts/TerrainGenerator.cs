@@ -6,13 +6,12 @@ public class TerrainGenerator : MonoBehaviour
 {
     public GameObject terrainChunk;
     public Transform player;
-    public static int stripSize = 8;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
     [Range(0f, 1f)][SerializeField] private float mineProbability = 0.1f; 
     public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
     FastNoise noise = new FastNoise();
-    int chunkDistX = 3; 
-    int chunkDistZ = 6; 
+    int chunkDistX = 4; // Visible chunks to the side of the player
+    int chunkDistZ = 10; // Visible chunks in front of the player, reduced from 6 to 3
     ChunkPos curChunk = new ChunkPos(-1,-1);
     List<TerrainChunk> pooledChunks = new List<TerrainChunk>();
     List<ChunkPos> toGenerate = new List<ChunkPos>();
@@ -68,19 +67,18 @@ public class TerrainGenerator : MonoBehaviour
         // Apply scaled noise
         float heightMap = (simplex1 + simplex2) * noiseScaleFactor;
 
-        int halfStripSize = stripSize / 2;
-        if (x >= -halfStripSize && x <= halfStripSize)
+        if (x >= -4 && x <= 4)
         {
             // Decide if the current block is a mine based on probability
-            if (y == 31 && Random.value < mineProbability) // Assuming mines are placed at the surface level for simplicity
+            if (y == 24 && Random.value < mineProbability) // Assuming mines are placed at the surface level for simplicity
             {
                 return BlockType.Mine; // Assuming BlockType.Mine exists
             }
-            else if (y == 31)
+            else if (y == 24)
             {
                 return BlockType.MainSurface;
             }
-            else if (y < 31) return BlockType.Color1;
+            else if (y < 24) return BlockType.Color1;
             else return BlockType.Air;
         }
 
@@ -89,7 +87,7 @@ public class TerrainGenerator : MonoBehaviour
         float elevationEffect = distanceFromStrip * distanceFromStrip * 0.025f; // Parabolic effect
 
         // Combine parabolic elevation with noise
-        float baseLandHeight = TerrainChunk.chunkHeight * 0.5f + heightMap + elevationEffect;
+        float baseLandHeight = TerrainChunk.chunkHeight * 0.4f + heightMap + elevationEffect;
 
         float noiseValue = noise.GetSimplex(x * colorFrequency, z * colorFrequency);
 
@@ -114,20 +112,21 @@ public class TerrainGenerator : MonoBehaviour
     
     void LoadChunks(bool instant = false)
     {
-        //the current chunk the player is in
-        int curChunkPosX = Mathf.FloorToInt(player.position.x / 16 ) * 16;
-        int curChunkPosZ = Mathf.FloorToInt(player.position.z / 16 ) * 16;
+        int chunkSize = 16;
+        int curChunkPosX = Mathf.FloorToInt((player.position.x + chunkSize / 2) / chunkSize) * chunkSize;
+        int curChunkPosZ = Mathf.FloorToInt((player.position.z + chunkSize / 2) / chunkSize) * chunkSize;
 
-        //entered a new chunk
+        Debug.DrawRay(new Vector3(curChunkPosX, 0, curChunkPosZ), Vector3.up * 100, Color.red);
+
         if(curChunk.x != curChunkPosX || curChunk.z != curChunkPosZ)
         {
             curChunk.x = curChunkPosX;
             curChunk.z = curChunkPosZ;
 
-            // Adjust the for loop to use the new chunkDistX and chunkDistZ
-            for(int i = curChunkPosX - 16 * chunkDistX; i <= curChunkPosX + 16 * chunkDistX; i += 16)
+            for(int i = curChunkPosX - chunkSize * chunkDistX; i <= curChunkPosX + chunkSize * chunkDistX; i += chunkSize)
             {
-                for(int j = curChunkPosZ - 16 * chunkDistZ; j <= curChunkPosZ + 16 * chunkDistZ; j += 16)
+                // Load chunks only in front of the player
+                for(int j = curChunkPosZ; j <= curChunkPosZ + chunkSize * chunkDistZ; j += chunkSize)
                 {
                     ChunkPos cp = new ChunkPos(i, j);
 
