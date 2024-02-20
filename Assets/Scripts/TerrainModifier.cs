@@ -5,7 +5,8 @@ public class TerrainModifier : MonoBehaviour
     public LayerMask groundLayer;
     public Camera playerCamera;
     public float rayLength = 400;
-    private BlockType selectedColor = BlockType.Color5; // Default color
+
+    private int mineCount = 0;
 
     void Update()
     {
@@ -40,7 +41,6 @@ public class TerrainModifier : MonoBehaviour
 
             UpdateChunkAndNeighbors(chunk, blockPos, chunkPos, localX, localZ);
         }
-        else Debug.Log($"Chunk not found at position: {chunkPos}");
     }
 
     private bool IsWithinStripBounds(int x) => Mathf.Abs(x) <= 4;
@@ -53,8 +53,11 @@ public class TerrainModifier : MonoBehaviour
 
     private void UpdateChunkAndNeighbors(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos, int localX, int localZ)
     {
-        chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Color3;
+        // TODO: Change block to number block here
+        chunk.blocks[localX, blockPos.y - 1, localZ] = Random.value < 0.1f ? BlockType.Color3 : BlockType.Color4;
         chunk.BuildMesh();
+
+        mineCount = 0;
 
         for (int dx = -1; dx <= 1; dx++)
         {
@@ -62,17 +65,22 @@ public class TerrainModifier : MonoBehaviour
             {
                 if (dx == 0 && dz == 0) continue;
                 UpdateNeighbor(chunk, blockPos, chunkPos, localX + dx, localZ + dz);
+
             }
         }
+
+        Debug.Log("Total Mine Count: " + mineCount);
     }
 
     private void UpdateNeighbor(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos, int neighborX, int neighborZ)
     {
         if (neighborX >= 1 && neighborX <= TerrainChunk.chunkWidth && neighborZ >= 1 && neighborZ <= TerrainChunk.chunkWidth)
         {
-            Debug.Log($"Same chunk neighbor type: {chunk.blocks[neighborX, blockPos.y - 1, neighborZ]}");
-            chunk.blocks[neighborX, blockPos.y - 1, neighborZ] = selectedColor;
-            chunk.BuildMesh();
+            // Check if BlockType.Mine , if yes +1 to mineCount
+            if (chunk.blocks[neighborX, blockPos.y - 1, neighborZ] == BlockType.Mine)
+            {
+                mineCount++;
+            }
         }
         else HandleEdgeCases(chunkPos, blockPos, neighborX, neighborZ);
     }
@@ -101,13 +109,11 @@ public class TerrainModifier : MonoBehaviour
         // Attempt to find the neighbor chunk and update the corresponding block if found.
         if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out TerrainChunk neighborChunk))
         {
-            neighborChunk.blocks[targetX, blockPos.y - 1, targetZ] = selectedColor;
-            neighborChunk.BuildMesh();
-            Debug.Log($"Updated block in neighbor chunk at {neighborChunkPos} to {selectedColor}");
-        }
-        else
-        {
-            Debug.Log($"Neighbor chunk not found at position: {neighborChunkPos}");
+            // Check if BlockType.Mine , if yes +1 to mineCount
+            if (neighborChunk.blocks[targetX, blockPos.y - 1, targetZ] == BlockType.Mine)
+            {
+                mineCount++;
+            }
         }
     }
 }
