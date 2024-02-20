@@ -41,7 +41,6 @@ public class TerrainModifier : MonoBehaviour
                 }
                 else
                 {
-                    CountSurroundingMines(blockPos, chunk, chunkPos);
                     UpdateChunkBlock(chunk, blockPos, chunkPos);
                 }
             }
@@ -81,6 +80,35 @@ public class TerrainModifier : MonoBehaviour
         // Update the block in the current chunk
         chunk.blocks[localX, blockPos.y - 1, localZ] = selectedColor;
         chunk.BuildMesh();
+
+        if (localX == 1)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x - TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
+            {
+                Debug.Log($"Block type: {adjacentChunk.blocks[TerrainChunk.chunkWidth, blockPos.y - 1, localZ]}");
+            }
+        }
+        else if (localX == TerrainChunk.chunkWidth)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x + TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
+            {
+                Debug.Log($"Block type: {adjacentChunk.blocks[1, blockPos.y - 1, localZ]}");
+            }
+        }
+        if (localZ == 1)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z - TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
+            {
+                Debug.Log($"Block type: {adjacentChunk.blocks[localX, blockPos.y - 1, TerrainChunk.chunkWidth]}");
+            }
+        }
+        else if (localZ == TerrainChunk.chunkWidth)
+        {
+            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z + TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
+            {
+                Debug.Log($"Block type: {adjacentChunk.blocks[localX, blockPos.y - 1, 1]}");
+            }
+        }
     }
 
     private int CountSurroundingMines(Vector3Int blockPos, TerrainChunk chunk, ChunkPos chunkPos)
