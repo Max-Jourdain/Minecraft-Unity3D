@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 public class TerrainModifier : MonoBehaviour
 {
     public LayerMask groundLayer;
     public Camera playerCamera;
     public float rayLength = 400;
-
     private BlockType selectedColor = BlockType.Color5; // Default color
 
     void Update()
@@ -23,120 +21,93 @@ public class TerrainModifier : MonoBehaviour
 
     private void ProcessHit(Vector3 hitPoint)
     {
-        const int maxHeightForColorChange = 32; // Set the max height for color change
-        Vector3Int blockPos = ConvertToBlockPosition(hitPoint);
+        const int maxHeightForColorChange = 32;
+        Vector3Int blockPos = Vector3Int.FloorToInt(hitPoint);
 
-        // Allow color change for blocks at or below maxHeightForColorChange
-        if (blockPos.y > maxHeightForColorChange) return; 
+        if (blockPos.y > maxHeightForColorChange || !IsWithinStripBounds(blockPos.x)) return;
 
-        if (IsWithinStripBounds(blockPos.x))
+        ChunkPos chunkPos = GetChunkPosition(blockPos);
+        if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
         {
-            ChunkPos chunkPos = GetChunkPosition(blockPos);
-            if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
+            int localX = blockPos.x - chunkPos.x + 1, localZ = blockPos.z - chunkPos.z + 1;
+            BlockType currentBlock = chunk.blocks[localX, blockPos.y - 1, localZ];
+            
+            if (currentBlock == BlockType.Mine)
             {
-                // ! Game Over if the block is a mine
-                if (chunk.blocks[blockPos.x - chunkPos.x + 1, blockPos.y - 1, blockPos.z - chunkPos.z + 1] == BlockType.Mine)
-                {
-                    Debug.Log("Game Over");
-                }
-                else
-                {
-                    UpdateChunkBlock(chunk, blockPos, chunkPos);
-                }
+                Debug.Log("Game Over");
+                return;
             }
-            else
-            {
-                Debug.Log($"Chunk not found at position: {chunkPos}");
-            }
+
+            UpdateChunkAndNeighbors(chunk, blockPos, chunkPos, localX, localZ);
         }
+        else Debug.Log($"Chunk not found at position: {chunkPos}");
     }
 
-    private Vector3Int ConvertToBlockPosition(Vector3 hitPoint)
-    {
-        return new Vector3Int(
-            Mathf.FloorToInt(hitPoint.x),
-            Mathf.FloorToInt(hitPoint.y),
-            Mathf.FloorToInt(hitPoint.z));
-    }
-
-    private bool IsWithinStripBounds(int x)
-    {
-        int halfStripSize = 8 / 2;
-        return x >= -halfStripSize && x <= halfStripSize;
-    }
+    private bool IsWithinStripBounds(int x) => Mathf.Abs(x) <= 4;
 
     private ChunkPos GetChunkPosition(Vector3Int blockPos)
     {
-        return new ChunkPos(
-            Mathf.FloorToInt(blockPos.x / (float)TerrainChunk.chunkWidth) * TerrainChunk.chunkWidth,
-            Mathf.FloorToInt(blockPos.z / (float)TerrainChunk.chunkWidth) * TerrainChunk.chunkWidth);
+        return new ChunkPos(Mathf.FloorToInt(blockPos.x / (float)TerrainChunk.chunkWidth) * TerrainChunk.chunkWidth,
+                            Mathf.FloorToInt(blockPos.z / (float)TerrainChunk.chunkWidth) * TerrainChunk.chunkWidth);
     }
 
-    private void UpdateChunkBlock(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos)
+    private void UpdateChunkAndNeighbors(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos, int localX, int localZ)
     {
-        int localX = blockPos.x - chunkPos.x + 1;
-        int localZ = blockPos.z - chunkPos.z + 1;
-
-        // Update the block in the current chunk
-        chunk.blocks[localX, blockPos.y - 1, localZ] = selectedColor;
+        chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Color3;
         chunk.BuildMesh();
 
-        if (localX == 1)
+        for (int dx = -1; dx <= 1; dx++)
         {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x - TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
+            for (int dz = -1; dz <= 1; dz++)
             {
-                Debug.Log($"Block type: {adjacentChunk.blocks[TerrainChunk.chunkWidth, blockPos.y - 1, localZ]}");
-            }
-        }
-        else if (localX == TerrainChunk.chunkWidth)
-        {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x + TerrainChunk.chunkWidth, chunkPos.z), out TerrainChunk adjacentChunk))
-            {
-                Debug.Log($"Block type: {adjacentChunk.blocks[1, blockPos.y - 1, localZ]}");
-            }
-        }
-        if (localZ == 1)
-        {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z - TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
-            {
-                Debug.Log($"Block type: {adjacentChunk.blocks[localX, blockPos.y - 1, TerrainChunk.chunkWidth]}");
-            }
-        }
-        else if (localZ == TerrainChunk.chunkWidth)
-        {
-            if (TerrainGenerator.chunks.TryGetValue(new ChunkPos(chunkPos.x, chunkPos.z + TerrainChunk.chunkWidth), out TerrainChunk adjacentChunk))
-            {
-                Debug.Log($"Block type: {adjacentChunk.blocks[localX, blockPos.y - 1, 1]}");
+                if (dx == 0 && dz == 0) continue;
+                UpdateNeighbor(chunk, blockPos, chunkPos, localX + dx, localZ + dz);
             }
         }
     }
 
-    private int CountSurroundingMines(Vector3Int blockPos, TerrainChunk chunk, ChunkPos chunkPos)
+    private void UpdateNeighbor(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos, int neighborX, int neighborZ)
     {
-        int mineCount = 0;
-        // Iterate through a 3x3 grid centered on the clicked block
-        for (int x = -1; x <= 1; x++)
+        if (neighborX >= 1 && neighborX <= TerrainChunk.chunkWidth && neighborZ >= 1 && neighborZ <= TerrainChunk.chunkWidth)
         {
-            for (int z = -1; z <= 1; z++)
-            {
-                if (x == 0 && z == 0) continue; // Skip the clicked block itself
+            Debug.Log($"Same chunk neighbor type: {chunk.blocks[neighborX, blockPos.y - 1, neighborZ]}");
+            chunk.blocks[neighborX, blockPos.y - 1, neighborZ] = selectedColor;
+            chunk.BuildMesh();
+        }
+        else HandleEdgeCases(chunkPos, blockPos, neighborX, neighborZ);
+    }
 
-                int neighborX = blockPos.x + x - chunkPos.x + 1;
-                int neighborZ = blockPos.z + z - chunkPos.z + 1;
+    private void HandleEdgeCases(ChunkPos chunkPos, Vector3Int blockPos, int neighborX, int neighborZ)
+    {
+        // Determine the offset for neighbor chunks based on the direction of the neighbor block.
+        int chunkOffsetX = 0, chunkOffsetZ = 0;
 
-                // Check if the neighbor is within chunk bounds
-                if (neighborX >= 0 && neighborX < TerrainChunk.chunkWidth && neighborZ >= 0 && neighborZ < TerrainChunk.chunkWidth)
-                {
-                    // Check if the neighboring block is a mine
-                    if (chunk.blocks[neighborX, blockPos.y - 1, neighborZ] == BlockType.Mine)
-                    {
-                        mineCount++;
-                    }
-                }
-            }
+        // Determine if the neighbor block is beyond the current chunk boundaries (edge or corner).
+        if (neighborX < 1 || neighborX > TerrainChunk.chunkWidth)
+        {
+            chunkOffsetX = neighborX < 1 ? -TerrainChunk.chunkWidth : TerrainChunk.chunkWidth;
+        }
+        if (neighborZ < 1 || neighborZ > TerrainChunk.chunkWidth)
+        {
+            chunkOffsetZ = neighborZ < 1 ? -TerrainChunk.chunkWidth : TerrainChunk.chunkWidth;
         }
 
-        Debug.Log($"Mine count: {mineCount}");
-        return mineCount;
+        // Calculate the position of the neighbor chunk taking into account the current chunk position and the determined offsets.
+        ChunkPos neighborChunkPos = new ChunkPos(chunkPos.x + chunkOffsetX, chunkPos.z + chunkOffsetZ);
+
+        int targetX = (neighborX < 1 || neighborX > TerrainChunk.chunkWidth) ? (neighborX < 1 ? TerrainChunk.chunkWidth : 1) : neighborX - chunkOffsetX;
+        int targetZ = (neighborZ < 1 || neighborZ > TerrainChunk.chunkWidth) ? (neighborZ < 1 ? TerrainChunk.chunkWidth : 1) : neighborZ - chunkOffsetZ;
+
+        // Attempt to find the neighbor chunk and update the corresponding block if found.
+        if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out TerrainChunk neighborChunk))
+        {
+            neighborChunk.blocks[targetX, blockPos.y - 1, targetZ] = selectedColor;
+            neighborChunk.BuildMesh();
+            Debug.Log($"Updated block in neighbor chunk at {neighborChunkPos} to {selectedColor}");
+        }
+        else
+        {
+            Debug.Log($"Neighbor chunk not found at position: {neighborChunkPos}");
+        }
     }
 }
