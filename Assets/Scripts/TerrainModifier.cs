@@ -22,8 +22,11 @@ public class TerrainModifier : MonoBehaviour
 
     private void ProcessHit(Vector3 hitPoint)
     {
-        const int maxHeightForColorChange = 32;
-        Vector3Int blockPos = Vector3Int.FloorToInt(hitPoint);
+        const int maxHeightForColorChange = 25;
+
+        // Adjust hitPoint slightly to ensure correct flooring, especially for y-coordinate
+        Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f);
+        Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint);
 
         if (blockPos.y > maxHeightForColorChange || !IsWithinStripBounds(blockPos.x)) return;
 
@@ -32,7 +35,7 @@ public class TerrainModifier : MonoBehaviour
         {
             int localX = blockPos.x - chunkPos.x + 1, localZ = blockPos.z - chunkPos.z + 1;
             BlockType currentBlock = chunk.blocks[localX, blockPos.y - 1, localZ];
-            
+
             if (currentBlock == BlockType.Mine)
             {
                 Debug.Log("Game Over");
@@ -53,10 +56,6 @@ public class TerrainModifier : MonoBehaviour
 
     private void UpdateChunkAndNeighbors(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos, int localX, int localZ)
     {
-        // TODO: Change block to number block here
-        chunk.blocks[localX, blockPos.y - 1, localZ] = Random.value < 0.1f ? BlockType.Color3 : BlockType.Color4;
-        chunk.BuildMesh();
-
         mineCount = 0;
 
         for (int dx = -1; dx <= 1; dx++)
@@ -69,6 +68,31 @@ public class TerrainModifier : MonoBehaviour
             }
         }
 
+        if (mineCount == 0) 
+        {
+            chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Air;
+            // Recursively update neighbors
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dz = -1; dz <= 1; dz++)
+                {
+                    if (dx == 0 && dz == 0) continue;
+                    Vector3Int neighborPos = new Vector3Int(blockPos.x + dx, blockPos.y, blockPos.z + dz);
+                    ChunkPos neighborChunkPos = GetChunkPosition(neighborPos);
+                    if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out TerrainChunk neighborChunk))
+                    {
+                        int localNeighborX = neighborPos.x - neighborChunkPos.x + 1, localNeighborZ = neighborPos.z - neighborChunkPos.z + 1;
+                        UpdateChunkAndNeighbors(neighborChunk, neighborPos, neighborChunkPos, localNeighborX, localNeighborZ);
+                    }
+                }
+            }
+        }
+
+        else if (mineCount == 1) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Num1;
+        else if (mineCount == 2) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Num2;
+
+        chunk.BuildMesh();
+
         Debug.Log("Total Mine Count: " + mineCount);
     }
 
@@ -76,7 +100,6 @@ public class TerrainModifier : MonoBehaviour
     {
         if (neighborX >= 1 && neighborX <= TerrainChunk.chunkWidth && neighborZ >= 1 && neighborZ <= TerrainChunk.chunkWidth)
         {
-            // Check if BlockType.Mine , if yes +1 to mineCount
             if (chunk.blocks[neighborX, blockPos.y - 1, neighborZ] == BlockType.Mine)
             {
                 mineCount++;
@@ -106,10 +129,9 @@ public class TerrainModifier : MonoBehaviour
         int targetX = (neighborX < 1 || neighborX > TerrainChunk.chunkWidth) ? (neighborX < 1 ? TerrainChunk.chunkWidth : 1) : neighborX - chunkOffsetX;
         int targetZ = (neighborZ < 1 || neighborZ > TerrainChunk.chunkWidth) ? (neighborZ < 1 ? TerrainChunk.chunkWidth : 1) : neighborZ - chunkOffsetZ;
 
-        // Attempt to find the neighbor chunk and update the corresponding block if found.
+        // Attempt to find the neighbor chunk
         if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out TerrainChunk neighborChunk))
         {
-            // Check if BlockType.Mine , if yes +1 to mineCount
             if (neighborChunk.blocks[targetX, blockPos.y - 1, targetZ] == BlockType.Mine)
             {
                 mineCount++;

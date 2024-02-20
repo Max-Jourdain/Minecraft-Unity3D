@@ -152,7 +152,7 @@ MonoBehaviour:
     type: 3}
   player: {fileID: 1100592808}
   colorFrequency: 5
-  mineProbability: 0.2
+  mineProbability: 0.164
 --- !u!4 &220957753
 Transform:
   m_ObjectHideFlags: 0
@@ -585,7 +585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transitionSpeed: 20
-  movementDistance: 20
+  movementDistance: 10
 --- !u!23 &1100592806
 MeshRenderer:
   m_ObjectHideFlags: 0
