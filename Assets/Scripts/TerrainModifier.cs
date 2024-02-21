@@ -22,8 +22,11 @@ public class TerrainModifier : MonoBehaviour
 
     private void ProcessHit(Vector3 hitPoint)
     {
-        const int maxHeightForColorChange = 32;
-        Vector3Int blockPos = Vector3Int.FloorToInt(hitPoint);
+        const int maxHeightForColorChange = 25;
+
+        // Adjust hitPoint slightly to ensure correct flooring, especially for y-coordinate
+        Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f);
+        Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint);
 
         if (blockPos.y > maxHeightForColorChange || !IsWithinStripBounds(blockPos.x)) return;
 
