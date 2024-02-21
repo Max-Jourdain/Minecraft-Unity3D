@@ -32,10 +32,22 @@ public class Block
 
     public static Dictionary<BlockType, Block> blocks = new Dictionary<BlockType, Block>()
     {
-        {BlockType.MainSurface, new Block(Tile.MainSurface, Tile.MainSurface, Tile.MainSurface)},
-        {BlockType.Mine, new Block(Tile.Color1, Tile.MainSurface, Tile.MainSurface)},
-        {BlockType.Num1, new Block(Tile.Num1, Tile.MainSurface, Tile.MainSurface)},
-        {BlockType.Num2, new Block(Tile.Num2, Tile.MainSurface, Tile.MainSurface)},
+        //* Numbers 0 to 8
+        {BlockType.Num1, new Block(Tile.Num1, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num2, new Block(Tile.Num2, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num3, new Block(Tile.Num3, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num4, new Block(Tile.Num4, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num5, new Block(Tile.Num5, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num6, new Block(Tile.Num6, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num7, new Block(Tile.Num7, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num8, new Block(Tile.Num8, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+
+        // Utils
+        {BlockType.Mine, new Block(Tile.Color1, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Empty_Undiscovered, new Block(Tile.Empty_Undiscovered, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Empty_Discovered, new Block(Tile.Empty_Discovered, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        
+        // Colors
         {BlockType.Color1, new Block(Tile.Color1, Tile.Color1, Tile.Color1)},
         {BlockType.Color2, new Block(Tile.Color2, Tile.Color2, Tile.Color2)},
         {BlockType.Color3, new Block(Tile.Color3, Tile.Color3, Tile.Color3)},
@@ -46,9 +58,8 @@ public class Block
 
 public enum BlockType 
 {
+    Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
     Air, 
-    MainSurface,
-    Mine,
-    Num1, Num2, 
+    Mine, Empty_Undiscovered, Empty_Discovered,
     Color1, Color2, Color3, Color4, Color5
 }

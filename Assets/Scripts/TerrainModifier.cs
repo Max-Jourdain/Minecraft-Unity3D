@@ -72,6 +72,14 @@ public class TerrainModifier : MonoBehaviour
             }
         }
 
+        if (mineCount == 0) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Empty_Discovered;
+        else if (mineCount > 0) chunk.blocks[localX, blockPos.y - 1, localZ] = (BlockType)mineCount - 1;
+    
+
+
+
+        chunk.BuildMesh();
+
         Debug.Log("Total Mine Count: " + mineCount);
     }
 

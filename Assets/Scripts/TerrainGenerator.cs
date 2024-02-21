@@ -76,7 +76,7 @@ public class TerrainGenerator : MonoBehaviour
             }
             else if (y == 24)
             {
-                return BlockType.MainSurface;
+                return BlockType.Empty_Undiscovered;
             }
             else if (y < 24) return BlockType.Color1;
             else return BlockType.Air;
