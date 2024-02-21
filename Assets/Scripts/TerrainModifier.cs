@@ -68,31 +68,7 @@ public class TerrainModifier : MonoBehaviour
             }
         }
 
-        if (mineCount == 0) 
-        {
-            chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Air;
-            // Recursively update neighbors
-            for (int dx = -1; dx <= 1; dx++)
-            {
-                for (int dz = -1; dz <= 1; dz++)
-                {
-                    if (dx == 0 && dz == 0) continue;
-                    Vector3Int neighborPos = new Vector3Int(blockPos.x + dx, blockPos.y, blockPos.z + dz);
-                    ChunkPos neighborChunkPos = GetChunkPosition(neighborPos);
-                    if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out TerrainChunk neighborChunk))
-                    {
-                        int localNeighborX = neighborPos.x - neighborChunkPos.x + 1, localNeighborZ = neighborPos.z - neighborChunkPos.z + 1;
-                        UpdateChunkAndNeighbors(neighborChunk, neighborPos, neighborChunkPos, localNeighborX, localNeighborZ);
-                    }
-                }
-            }
-        }
-
-        else if (mineCount == 1) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Num1;
-        else if (mineCount == 2) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Num2;
-
         chunk.BuildMesh();
-
         Debug.Log("Total Mine Count: " + mineCount);
     }
 
