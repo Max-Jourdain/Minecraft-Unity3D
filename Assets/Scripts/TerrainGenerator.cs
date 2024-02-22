@@ -69,17 +69,23 @@ public class TerrainGenerator : MonoBehaviour
 
         if (x >= -4 && x <= 4)
         {
-            // Decide if the current block is a mine based on probability
-            if (y == 24 && Random.value < mineProbability) // Assuming mines are placed at the surface level for simplicity
+            if (y == 24 && Random.value < mineProbability && z != 0) 
             {
-                return BlockType.Mine; // Assuming BlockType.Mine exists
+                return BlockType.Mine;
             }
+            else if (y == 24 && z == 0)
+            {
+                // return the block based on noise
+                return GetColorBasedBlockType(noise.GetSimplex(x * colorFrequency, z * colorFrequency));
+            } 
             else if (y == 24)
             {
                 return BlockType.Unplayed;
             }
-            else if (y < 24) return BlockType.Color1;
-            else return BlockType.Air;
+            else 
+            {
+                return BlockType.Air;
+            }
         }
 
 
