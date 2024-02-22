@@ -22,13 +22,10 @@ public class TerrainModifier : MonoBehaviour
 
     private void ProcessHit(Vector3 hitPoint)
     {
-        const int maxHeightForColorChange = 25;
-
-        // Adjust hitPoint slightly to ensure correct flooring, especially for y-coordinate
         Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f);
         Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint);
 
-        if (blockPos.y > maxHeightForColorChange || !IsWithinStripBounds(blockPos.x)) return;
+        if (!IsWithinStripBounds(blockPos.x)) return;
 
         ChunkPos chunkPos = GetChunkPosition(blockPos);
         if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
@@ -72,7 +69,7 @@ public class TerrainModifier : MonoBehaviour
             }
         }
 
-        if (mineCount == 0) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Empty_Discovered;
+        if (mineCount == 0) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Played;
         else if (mineCount > 0) chunk.blocks[localX, blockPos.y - 1, localZ] = (BlockType)mineCount - 1;
     
 

@@ -33,26 +33,27 @@ public class Block
     public static Dictionary<BlockType, Block> blocks = new Dictionary<BlockType, Block>()
     {
         //* Numbers 0 to 8
-        {BlockType.Num1, new Block(Tile.Num1, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Num2, new Block(Tile.Num2, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Num3, new Block(Tile.Num3, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Num4, new Block(Tile.Num4, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Num5, new Block(Tile.Num5, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Num6, new Block(Tile.Num6, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Num7, new Block(Tile.Num7, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Num8, new Block(Tile.Num8, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Num1, new Block(Tile.Num1, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Num2, new Block(Tile.Num2, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Num3, new Block(Tile.Num3, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Num4, new Block(Tile.Num4, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Num5, new Block(Tile.Num5, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Num6, new Block(Tile.Num6, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Num7, new Block(Tile.Num7, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Num8, new Block(Tile.Num8, Tile.Unplayed, Tile.Unplayed)},
 
         // Utils
-        {BlockType.Mine, new Block(Tile.Color1, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Empty_Undiscovered, new Block(Tile.Empty_Undiscovered, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
-        {BlockType.Empty_Discovered, new Block(Tile.Empty_Discovered, Tile.Empty_Undiscovered, Tile.Empty_Undiscovered)},
+        {BlockType.Unplayed, new Block(Tile.Unplayed, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Played, new Block(Tile.Played, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Flag, new Block(Tile.Flag, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Mine, new Block(Tile.Mine, Tile.Unplayed, Tile.Unplayed)},
+
         
         // Colors
         {BlockType.Color1, new Block(Tile.Color1, Tile.Color1, Tile.Color1)},
         {BlockType.Color2, new Block(Tile.Color2, Tile.Color2, Tile.Color2)},
         {BlockType.Color3, new Block(Tile.Color3, Tile.Color3, Tile.Color3)},
         {BlockType.Color4, new Block(Tile.Color4, Tile.Color4, Tile.Color4)},
-        {BlockType.Color5, new Block(Tile.Color5, Tile.Color5, Tile.Color5)},
     };
 }
 
@@ -60,6 +61,6 @@ public enum BlockType
 {
     Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
     Air, 
-    Mine, Empty_Undiscovered, Empty_Discovered,
-    Color1, Color2, Color3, Color4, Color5
+    Unplayed, Played, Mine, Flag,
+    Color1, Color2, Color3, Color4
 }

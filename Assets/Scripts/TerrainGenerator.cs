@@ -76,7 +76,7 @@ public class TerrainGenerator : MonoBehaviour
             }
             else if (y == 24)
             {
-                return BlockType.Empty_Undiscovered;
+                return BlockType.Unplayed;
             }
             else if (y < 24) return BlockType.Color1;
             else return BlockType.Air;
@@ -107,7 +107,7 @@ public class TerrainGenerator : MonoBehaviour
         else if (noiseValue < -0.2) return BlockType.Color2;
         else if (noiseValue < 0.2) return BlockType.Color3;
         else if (noiseValue < 0.6) return BlockType.Color4;
-        else return BlockType.Color5;
+        else return BlockType.Color1;
     }
     
     void LoadChunks(bool instant = false)

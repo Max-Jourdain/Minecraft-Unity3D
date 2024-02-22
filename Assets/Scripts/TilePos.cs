@@ -29,6 +29,7 @@ public class TilePos
 
     public static Dictionary<Tile, TilePos> tiles = new Dictionary<Tile, TilePos>()
     {
+        // Numbers 1 to 8
         {Tile.Num1, new TilePos(0, 0)},
         {Tile.Num2, new TilePos(0, 1)},
         {Tile.Num3, new TilePos(0, 2)},
@@ -37,13 +38,18 @@ public class TilePos
         {Tile.Num6, new TilePos(0, 5)},
         {Tile.Num7, new TilePos(0, 6)},
         {Tile.Num8, new TilePos(0, 7)},
-        {Tile.Color1, new TilePos(1, 0)},
-        {Tile.Color2, new TilePos(1, 1)},
-        {Tile.Color3, new TilePos(1, 2)},
-        {Tile.Color4, new TilePos(1, 3)},
-        {Tile.Color5, new TilePos(1, 4)},
-        {Tile.Empty_Undiscovered, new TilePos(2, 0)},
-        {Tile.Empty_Discovered, new TilePos(2, 1)},
+
+        // Utils
+        {Tile.Unplayed, new TilePos(1, 0)},
+        {Tile.Played, new TilePos(1, 1)},
+        {Tile.Flag, new TilePos(1, 2)},
+        {Tile.Mine, new TilePos(1, 3)},
+
+        // Colors
+        {Tile.Color1, new TilePos(2, 0)},
+        {Tile.Color2, new TilePos(2, 1)},
+        {Tile.Color3, new TilePos(2, 2)},
+        {Tile.Color4, new TilePos(2, 3)},
 
     };
 }
@@ -51,6 +57,6 @@ public class TilePos
 public enum Tile 
 { 
     Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
-    Color1, Color2, Color3, Color4, Color5,
-    Empty_Undiscovered, Empty_Discovered
+    Color1, Color2, Color3, Color4,
+    Unplayed, Played, Flag, Mine
 }
