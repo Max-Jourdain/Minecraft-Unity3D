@@ -69,11 +69,11 @@ public class TerrainGenerator : MonoBehaviour
 
         if (x >= -4 && x <= 4)
         {
-            if (y == 24 && Random.value < mineProbability && z != 0) 
+            if (y == 24 && Random.value < mineProbability && z >= 3) 
             {
                 return BlockType.Mine;
             }
-            else if (y == 24 && z == 0)
+            else if (y == 24 && z <= 2)
             {
                 // return the block based on noise
                 return GetColorBasedBlockType(noise.GetSimplex(x * colorFrequency, z * colorFrequency));

@@ -53,10 +53,6 @@ public class TerrainModifier : MonoBehaviour
 
     private void UpdateChunkAndNeighbors(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos, int localX, int localZ)
     {
-        // TODO: Change block to number block here
-        chunk.blocks[localX, blockPos.y - 1, localZ] = Random.value < 0.1f ? BlockType.Color3 : BlockType.Color4;
-        chunk.BuildMesh();
-
         mineCount = 0;
 
         for (int dx = -1; dx <= 1; dx++)
@@ -65,31 +61,37 @@ public class TerrainModifier : MonoBehaviour
             {
                 if (dx == 0 && dz == 0) continue;
                 UpdateNeighbor(chunk, blockPos, chunkPos, localX + dx, localZ + dz);
-
             }
         }
 
-        if (mineCount == 0) chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Played;
+        if (mineCount == 0) 
+        {
+            chunk.blocks[localX, blockPos.y - 1, localZ] = BlockType.Played;
+
+            //! Flood algorithm for revealing empty blocks
+            bool allDirectionChecked = false;
+            while (allDirectionChecked == false)
+            {
+                if (BlockType.Unplayed == chunk.blocks[localX - 1, blockPos.y - 1, localZ]) UpdateChunkAndNeighbors(chunk, blockPos + Vector3Int.left, chunkPos, localX - 1, localZ);
+                if (BlockType.Unplayed == chunk.blocks[localX + 1, blockPos.y - 1, localZ]) UpdateChunkAndNeighbors(chunk, blockPos + Vector3Int.right, chunkPos, localX + 1, localZ);
+                if (BlockType.Unplayed == chunk.blocks[localX, blockPos.y - 1, localZ - 1]) UpdateChunkAndNeighbors(chunk, blockPos + Vector3Int.back, chunkPos, localX, localZ - 1);
+                if (BlockType.Unplayed == chunk.blocks[localX, blockPos.y - 1, localZ + 1]) UpdateChunkAndNeighbors(chunk, blockPos + Vector3Int.forward, chunkPos, localX, localZ + 1);
+                allDirectionChecked = true;
+            }
+
+        }
         else if (mineCount > 0) chunk.blocks[localX, blockPos.y - 1, localZ] = (BlockType)mineCount - 1;
-    
-
-
 
         chunk.BuildMesh();
-
-        Debug.Log("Total Mine Count: " + mineCount);
     }
 
     private void UpdateNeighbor(TerrainChunk chunk, Vector3Int blockPos, ChunkPos chunkPos, int neighborX, int neighborZ)
     {
         if (neighborX >= 1 && neighborX <= TerrainChunk.chunkWidth && neighborZ >= 1 && neighborZ <= TerrainChunk.chunkWidth)
         {
-            // Check if BlockType.Mine , if yes +1 to mineCount
-            if (chunk.blocks[neighborX, blockPos.y - 1, neighborZ] == BlockType.Mine)
-            {
-                mineCount++;
-            }
+            if (chunk.blocks[neighborX, blockPos.y - 1, neighborZ] == BlockType.Mine) mineCount++;
         }
+
         else HandleEdgeCases(chunkPos, blockPos, neighborX, neighborZ);
     }
 

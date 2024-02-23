@@ -151,7 +151,7 @@ MonoBehaviour:
   terrainChunk: {fileID: 6546764858940181633, guid: 5ce7861e514decf459c0596a9a9e7c6c,
     type: 3}
   player: {fileID: 1100592808}
-  colorFrequency: 5
+  colorFrequency: 6
   mineProbability: 0.1
 --- !u!4 &220957753
 Transform:
