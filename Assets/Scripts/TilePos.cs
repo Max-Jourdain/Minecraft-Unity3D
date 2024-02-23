@@ -50,6 +50,7 @@ public class TilePos
         {Tile.Color2, new TilePos(2, 1)},
         {Tile.Color3, new TilePos(2, 2)},
         {Tile.Color4, new TilePos(2, 3)},
+        {Tile.Color5, new TilePos(2, 4)}
 
     };
 }
@@ -57,6 +58,6 @@ public class TilePos
 public enum Tile 
 { 
     Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
-    Color1, Color2, Color3, Color4,
+    Color1, Color2, Color3, Color4, Color5,
     Unplayed, Played, Flag, Mine
 }

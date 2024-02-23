@@ -54,6 +54,7 @@ public class Block
         {BlockType.Color2, new Block(Tile.Color2, Tile.Color2, Tile.Color2)},
         {BlockType.Color3, new Block(Tile.Color3, Tile.Color3, Tile.Color3)},
         {BlockType.Color4, new Block(Tile.Color4, Tile.Color4, Tile.Color4)},
+        {BlockType.Color5, new Block(Tile.Color5, Tile.Color5, Tile.Color5)}
     };
 }
 
@@ -62,5 +63,5 @@ public enum BlockType
     Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
     Air, 
     Unplayed, Played, Mine, Flag,
-    Color1, Color2, Color3, Color4
+    Color1, Color2, Color3, Color4, Color5
 }
