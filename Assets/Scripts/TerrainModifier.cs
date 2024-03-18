@@ -27,16 +27,17 @@ public class TerrainModifier : MonoBehaviour
         ChunkPos chunkPos = GetChunkPosition(blockPos); // Get the chunk position from the block position
         if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk)) // Check if the chunk exists
         {
-            int localX = blockPos.x - chunkPos.x + 1, localZ = blockPos.z - chunkPos.z + 1; // Calculate local block positions within the chunk
+            int localX = blockPos.x - chunkPos.x;
+            int localZ = blockPos.z - chunkPos.z;
             
             // Check if the block is unplayed before starting flood fill
-            if (chunk.blocks[localX, blockPos.y - 1, localZ] == BlockType.Mine)
+            if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
             {
                 Debug.Log("Game Over");
             }
-            else if (chunk.blocks[localX, blockPos.y - 1, localZ] == BlockType.Unplayed) // Ensure the block is unplayed
+            else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
             {
-                FloodFill(blockPos, localX, localZ); // Start flood fill from this block
+                FloodFill(blockPos, localX, localZ);
             }
             else
             {
