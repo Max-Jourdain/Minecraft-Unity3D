@@ -6,16 +6,68 @@ public class TerrainModifier : MonoBehaviour
     public LayerMask groundLayer;
     public Camera playerCamera;
     public float rayLength = 400;
+    private Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
 
     void Update()
     {
         if (Input.GetMouseButtonDown(0)) // Left mouse click
         {
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
+            RaycastAndProcess(Input.mousePosition, false);
+        }
+        else if (Input.GetMouseButtonDown(1)) // Right mouse click
+        {
+            RaycastAndProcess(Input.mousePosition, true);
+        }
+    }
+
+    private void RaycastAndProcess(Vector3 mousePosition, bool isRightClick)
+    {
+        Ray ray = playerCamera.ScreenPointToRay(mousePosition);
+        Debug.DrawRay(ray.origin, ray.direction * rayLength, Color.red, 100f);
+        if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
+        {
+            if (isRightClick)
+            {
+                ProcessRightClick(hit.point);
+            }
+            else
             {
                 ProcessHit(hit.point);
             }
+        }
+    }
+
+    private void ProcessRightClick(Vector3 hitPoint)
+    {
+        Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f);
+        Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint);
+
+        ChunkPos chunkPos = GetChunkPosition(blockPos);
+        if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
+        {
+            int localX = blockPos.x - chunkPos.x;
+            int localZ = blockPos.z - chunkPos.z;
+
+            Vector3Int localPos = new Vector3Int(localX + 1, blockPos.y - 1, localZ + 1);
+            BlockType currentBlock = chunk.blocks[localPos.x, localPos.y, localPos.z];
+
+            if (currentBlock == BlockType.Flag)
+            {
+                // If the block is flagged, unflag it and restore its original state
+                if (originalBlockStates.TryGetValue(blockPos, out BlockType originalState))
+                {
+                    chunk.blocks[localPos.x, localPos.y, localPos.z] = originalState;
+                    originalBlockStates.Remove(blockPos); // Remove the entry as it's no longer needed
+                }
+            }
+            else if (currentBlock == BlockType.Mine || currentBlock == BlockType.Unplayed)
+            {
+                // If the block is a mine or unplayed, flag it and remember its original state
+                originalBlockStates[blockPos] = currentBlock; // Remember the original state
+                chunk.blocks[localPos.x, localPos.y, localPos.z] = BlockType.Flag;
+            }
+
+            chunk.BuildMesh();
         }
     }
 
@@ -171,7 +223,8 @@ public class TerrainModifier : MonoBehaviour
                     if (localX > TerrainChunk.chunkWidth) localX -= TerrainChunk.chunkWidth;
                     if (localZ > TerrainChunk.chunkWidth) localZ -= TerrainChunk.chunkWidth;
 
-                    if (neighborChunk.blocks[localX, y - 1, localZ] == BlockType.Mine)
+                    BlockType neighborBlockType = neighborChunk.blocks[localX, y - 1, localZ];
+                    if (neighborBlockType == BlockType.Mine || neighborBlockType == BlockType.Flag)
                     {
                         mineCount++;
                     }
@@ -180,6 +233,7 @@ public class TerrainModifier : MonoBehaviour
         }
         return mineCount;
     }
+
 
     private ChunkPos GetChunkPosition(Vector3Int blockPos)
     {
