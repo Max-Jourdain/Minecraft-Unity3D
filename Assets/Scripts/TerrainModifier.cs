@@ -34,6 +34,7 @@ public class TerrainModifier : MonoBehaviour
             if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
             {
                 Debug.Log("Game Over");
+                Explode(3, blockPos);
             }
             else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
             {
@@ -42,6 +43,33 @@ public class TerrainModifier : MonoBehaviour
             else
             {
                 Debug.Log("Block already played");
+            }
+        }
+    }
+
+    private void Explode(int radius, Vector3Int center)
+    {
+        for (int dx = -radius; dx <= radius; dx++)
+        {
+            for (int dy = -radius; dy <= radius; dy++)
+            {
+                for (int dz = -radius; dz <= radius; dz++)
+                {
+                    Vector3Int blockPos = center + new Vector3Int(dx, dy, dz);
+                    if (Vector3.Distance(center, blockPos) <= radius)
+                    {
+                        ChunkPos chunkPos = GetChunkPosition(blockPos);
+                        if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
+                        {
+                            int localX = blockPos.x - chunkPos.x;
+                            int localZ = blockPos.z - chunkPos.z;
+
+                            // set the block to air
+                            chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] = BlockType.Air;
+                            chunk.BuildMesh();
+                        }
+                    }
+                }
             }
         }
     }
