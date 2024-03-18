@@ -33,7 +33,8 @@ public class TerrainModifier : MonoBehaviour
             // Check if the block is unplayed before starting flood fill
             if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
             {
-                Explode(2, blockPos);
+                Debug.Log("Game Over");
+                Explode(3, blockPos);
             }
             else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
             {
@@ -75,68 +76,55 @@ public class TerrainModifier : MonoBehaviour
 
     private void FloodFill(Vector3Int blockPos, int localX, int localZ)
     {
-        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
-        HashSet<ChunkPos> affectedChunks = new HashSet<ChunkPos>(); // Track affected chunks
         Queue<Vector3Int> queue = new Queue<Vector3Int>();
-
+        // Convert local positions back to world positions before enqueuing
         ChunkPos initialChunkPos = GetChunkPosition(blockPos);
         Vector3Int worldPos = new Vector3Int(localX + initialChunkPos.x, blockPos.y, localZ + initialChunkPos.z);
         queue.Enqueue(worldPos);
-        visited.Add(worldPos);
 
         while (queue.Count > 0)
         {
             Vector3Int currentPos = queue.Dequeue();
             ChunkPos currentChunkPos = GetChunkPosition(currentPos);
             TerrainChunk currentChunk;
+
             if (!TerrainGenerator.chunks.TryGetValue(currentChunkPos, out currentChunk)) continue;
 
             int x = currentPos.x - currentChunkPos.x + 1;
             int z = currentPos.z - currentChunkPos.z + 1;
 
+            // Skip already processed or invalid blocks
             if (!IsValidBlock(currentChunk, x, currentPos.y, z)) continue;
 
-            // Add the chunk to the affectedChunks set to ensure it gets updated
-            affectedChunks.Add(currentChunkPos);
-
+            // Process current block
             int mineCount = CountMines(currentChunk, x, currentPos.y, z, currentChunkPos);
 
+            // Update current block based on mine count
             if (mineCount == 0)
             {
                 currentChunk.blocks[x, currentPos.y - 1, z] = BlockType.Played;
-                foreach (var neighbor in GetNeighbors(currentPos))
-                {
-                    if (!visited.Contains(neighbor))
-                    {
-                        queue.Enqueue(neighbor);
-                        visited.Add(neighbor);
-                    }
-                }
+                // Enqueue neighbors
+                EnqueueNeighbors(queue, currentPos);
             }
             else
             {
                 currentChunk.blocks[x, currentPos.y - 1, z] = (BlockType)mineCount - 1;
             }
-        }
 
-        // After processing all blocks, update the mesh for each affected chunk
-        foreach (var chunkPos in affectedChunks)
-        {
-            if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
-            {
-                chunk.BuildMesh();
-            }
+            currentChunk.BuildMesh();
         }
     }
 
-    private IEnumerable<Vector3Int> GetNeighbors(Vector3Int pos)
+    private void EnqueueNeighbors(Queue<Vector3Int> queue, Vector3Int currentPos)
     {
+        // Enqueue all eight neighboring blocks
         for (int dx = -1; dx <= 1; dx++)
         {
             for (int dz = -1; dz <= 1; dz++)
             {
-                if (dx == 0 && dz == 0) continue;
-                yield return new Vector3Int(pos.x + dx, pos.y, pos.z + dz);
+                if (dx == 0 && dz == 0) continue; // Skip the current block
+                Vector3Int neighborPos = new Vector3Int(currentPos.x + dx, currentPos.y, currentPos.z + dz);
+                queue.Enqueue(neighborPos);
             }
         }
     }
