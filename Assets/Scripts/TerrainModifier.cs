@@ -40,6 +40,8 @@ public class TerrainModifier : MonoBehaviour
 
     private void ProcessRightClick(Vector3 hitPoint)
     {
+        if (!hasFirstClickOccurred) return;
+
         Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f);
         Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint);
 
@@ -95,6 +97,8 @@ public class TerrainModifier : MonoBehaviour
                 if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
                 {
                     Debug.Log("Game over");
+                    Block.UpdateTile(BlockType.Mine, Tile.Mine);
+                    UpdateVisibleChunks(); // Update all visible chunks
                 }
                 else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
                 {
@@ -105,6 +109,14 @@ public class TerrainModifier : MonoBehaviour
                     Debug.Log("Block already played");
                 }
             }
+        }
+    }
+
+    private void UpdateVisibleChunks()
+    {
+        foreach (TerrainChunk chunk in TerrainGenerator.chunks.Values)
+        {
+            chunk.BuildMesh();
         }
     }
 

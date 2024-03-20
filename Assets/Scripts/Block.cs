@@ -46,7 +46,7 @@ public class Block
         {BlockType.Unplayed, new Block(Tile.Unplayed, Tile.Unplayed, Tile.Unplayed)},
         {BlockType.Played, new Block(Tile.Played, Tile.Unplayed, Tile.Unplayed)},
         {BlockType.Flag, new Block(Tile.Flag, Tile.Unplayed, Tile.Unplayed)},
-        {BlockType.Mine, new Block(Tile.Mine, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Mine, new Block(Tile.Unplayed, Tile.Unplayed, Tile.Unplayed)},
 
         
         // Colors
@@ -56,7 +56,17 @@ public class Block
         {BlockType.Color4, new Block(Tile.Color4, Tile.Color4, Tile.Color4)},
         {BlockType.Color5, new Block(Tile.Color5, Tile.Color5, Tile.Color5)}
     };
+
+    // function tha twill update the first tile of a blocktype
+    public static void UpdateTile(BlockType blockType, Tile tile)
+    {
+        Block block = blocks[blockType];
+        block.top = block.side = block.bottom = tile;
+        block.GetPositions();
+    }
+    
 }
+
 
 public enum BlockType 
 {
