@@ -7,6 +7,7 @@ public class TerrainModifier : MonoBehaviour
     public Camera playerCamera;
     public float rayLength = 400;
     private Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
+    public static bool hasFirstClickOccurred = false;
 
     void Update()
     {
@@ -73,7 +74,7 @@ public class TerrainModifier : MonoBehaviour
 
     private void ProcessHit(Vector3 hitPoint)
     {
-        Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f); // Slightly adjust the hit point to ensure it's inside the block
+        Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f); // Adjust the hit point to ensure it's inside the block
         Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint); // Convert the hit point to a block position
 
         ChunkPos chunkPos = GetChunkPosition(blockPos); // Get the chunk position from the block position
@@ -81,19 +82,55 @@ public class TerrainModifier : MonoBehaviour
         {
             int localX = blockPos.x - chunkPos.x;
             int localZ = blockPos.z - chunkPos.z;
-            
-            // Check if the block is unplayed before starting flood fill
-            if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
+
+            if (!hasFirstClickOccurred)
             {
-                Explode(2, blockPos);
-            }
-            else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
-            {
+                hasFirstClickOccurred = true;
+                MakeFirstClickSafe(blockPos, localX, localZ, chunk);
                 FloodFill(blockPos, localX, localZ);
             }
             else
             {
-                Debug.Log("Block already played");
+                // Normal game logic for handling clicks after the first one
+                if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
+                {
+                    Debug.Log("Game over");
+                }
+                else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
+                {
+                    FloodFill(blockPos, localX, localZ);
+                }
+                else
+                {
+                    Debug.Log("Block already played");
+                }
+            }
+        }
+    }
+
+    private void MakeFirstClickSafe(Vector3Int blockPos, int localX, int localZ, TerrainChunk chunk)
+    {
+        int safeRadius = 1; 
+
+        for (int dx = -safeRadius; dx <= safeRadius; dx++)
+        {
+            for (int dz = -safeRadius; dz <= safeRadius; dz++)
+            {
+                // Calculate the global position of the neighbor block.
+                Vector3Int neighborPos = new Vector3Int(blockPos.x + dx, blockPos.y, blockPos.z + dz);
+                ChunkPos neighborChunkPos = GetChunkPosition(neighborPos);
+                TerrainChunk neighborChunk;
+                if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out neighborChunk))
+                {
+                    int localNeighborX = neighborPos.x - neighborChunkPos.x + 1;
+                    int localNeighborZ = neighborPos.z - neighborChunkPos.z + 1;
+
+                    if (neighborChunk.blocks[localNeighborX, neighborPos.y - 1, localNeighborZ] == BlockType.Mine)
+                    {
+                        neighborChunk.blocks[localNeighborX, neighborPos.y - 1, localNeighborZ] = BlockType.Unplayed;
+                        neighborChunk.BuildMesh();
+                    }
+                }
             }
         }
     }

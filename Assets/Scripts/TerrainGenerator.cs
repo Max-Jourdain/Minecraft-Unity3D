@@ -75,7 +75,6 @@ public class TerrainGenerator : MonoBehaviour
             }
             else if (y == 24 && z <= 2)
             {
-                // return the block based on noise
                 return GetColorBasedBlockType(noise.GetSimplex(x * colorFrequency, z * colorFrequency));
             } 
             else if (y == 24)
