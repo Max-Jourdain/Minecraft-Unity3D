@@ -1,5 +1,6 @@
 trackSelection = true
 refreshSearchWindowsInPlayMode = false
+pickerAdvancedUI = false
 fetchPreview = true
 defaultFlags = 0
 keepOpen = false
@@ -16,6 +17,9 @@ scopes = {
 	"last_search.8DF93126" = ""
 	"OpenInspectorPreview.8DF93126" = "0"
 	"currentGroup.8DF93126" = ""
+	"last_search.66F56946" = ""
+	"OpenInspectorPreview.66F56946" = "0"
+	"currentGroup.66F56946" = ""
 }
 providers = {
 	performance = {
