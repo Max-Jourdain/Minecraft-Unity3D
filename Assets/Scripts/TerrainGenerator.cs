@@ -26,6 +26,21 @@ public class TerrainGenerator : MonoBehaviour
         LoadChunks();
     }
 
+    public void ResetTerrain()
+    {
+        foreach (var chunk in chunks.Values)
+        {
+            chunk.gameObject.SetActive(false);
+            pooledChunks.Add(chunk);
+        }
+
+        chunks.Clear();
+        toGenerate.Clear();
+
+        LoadChunks(true); // Passing true to force immediate loading
+    }
+
+
     void BuildChunk(int xPos, int zPos)
     {
         TerrainChunk chunk;

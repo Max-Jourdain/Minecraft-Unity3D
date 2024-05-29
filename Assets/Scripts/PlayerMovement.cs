@@ -12,6 +12,11 @@ public class PlayerMovement : MonoBehaviour
         targetPosition = transform.position;
     }
 
+    public void ResetPosition()
+    {
+        targetPosition = new Vector3(transform.position.x, transform.position.y, 0);
+    }
+
     void Update()
     {
         if (transform.position == targetPosition)
