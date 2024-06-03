@@ -14,7 +14,6 @@ public class GameManager : MonoBehaviour
         {
             terrainModifier.ResetTerrain();
             terrainGenerator.ResetTerrain();
-            playerMovement.ResetPosition();
 
             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
 

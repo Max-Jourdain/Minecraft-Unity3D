@@ -6,6 +6,7 @@ public class TerrainGenerator : MonoBehaviour
 {
     public GameObject terrainChunk;
     public Transform player;
+    public GameObject chunksParent;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
     [Range(0f, 1f)][SerializeField] private float mineProbability = 0.1f; 
     public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
@@ -55,6 +56,7 @@ public class TerrainGenerator : MonoBehaviour
         {
             GameObject chunkGO = Instantiate(terrainChunk, new Vector3(xPos, 0, zPos), Quaternion.identity);
             chunk = chunkGO.GetComponent<TerrainChunk>();
+            chunk.transform.parent = chunksParent.transform;
         }
 
         for(int x = 0; x < TerrainChunk.chunkWidth+2; x++)

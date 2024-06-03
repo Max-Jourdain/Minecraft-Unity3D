@@ -105,7 +105,7 @@ public class TerrainModifier : MonoBehaviour
                 if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
                 {
                     Debug.Log("Game over");
-                    Explode(2, blockPos);
+                    // Explode(2, blockPos);
                     Block.UpdateTile(BlockType.Mine, Tile.Mine);
                     UpdateVisibleChunks(); // Update all visible chunks
                 }
