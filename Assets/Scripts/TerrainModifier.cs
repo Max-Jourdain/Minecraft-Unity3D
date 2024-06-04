@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class TerrainModifier : MonoBehaviour
 {
@@ -8,9 +9,17 @@ public class TerrainModifier : MonoBehaviour
     public float rayLength = 400;
     private Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
     public static bool hasFirstClickOccurred = false;
+    public bool isGameOver = false;
 
     void Update()
     {
+        if (isGameOver) return;
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetTerrain();
+        }
+
         if (Input.GetMouseButtonDown(0)) // Left mouse click
         {
             RaycastAndProcess(Input.mousePosition, false);
@@ -40,6 +49,9 @@ public class TerrainModifier : MonoBehaviour
 
     public void ResetTerrain()
     {
+        // reload the current scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
         originalBlockStates.Clear();
         hasFirstClickOccurred = false;
         Block.UpdateTile(BlockType.Unplayed, Tile.Mine);
@@ -105,8 +117,11 @@ public class TerrainModifier : MonoBehaviour
                 if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
                 {
                     Debug.Log("Game over");
-                    // Explode(2, blockPos);
                     Block.UpdateTile(BlockType.Mine, Tile.Mine);
+
+                    // Disable player movement and control
+                    isGameOver = true;
+
                     UpdateVisibleChunks(); // Update all visible chunks
                 }
                 else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
@@ -150,33 +165,6 @@ public class TerrainModifier : MonoBehaviour
                     {
                         neighborChunk.blocks[localNeighborX, neighborPos.y - 1, localNeighborZ] = BlockType.Unplayed;
                         neighborChunk.BuildMesh();
-                    }
-                }
-            }
-        }
-    }
-
-    private void Explode(int radius, Vector3Int center)
-    {
-        for (int dx = -radius; dx <= radius; dx++)
-        {
-            for (int dy = -radius; dy <= radius; dy++)
-            {
-                for (int dz = -radius; dz <= radius; dz++)
-                {
-                    Vector3Int blockPos = center + new Vector3Int(dx, dy, dz);
-                    if (Vector3.Distance(center, blockPos) <= radius)
-                    {
-                        ChunkPos chunkPos = GetChunkPosition(blockPos);
-                        if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
-                        {
-                            int localX = blockPos.x - chunkPos.x;
-                            int localZ = blockPos.z - chunkPos.z;
-
-                            // set the block to air
-                            chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] = BlockType.Air;
-                            chunk.BuildMesh();
-                        }
                     }
                 }
             }
