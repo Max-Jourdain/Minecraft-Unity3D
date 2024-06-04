@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using TMPro;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class TerrainModifier : MonoBehaviour
 {
@@ -10,6 +12,8 @@ public class TerrainModifier : MonoBehaviour
     private Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
     public static bool hasFirstClickOccurred = false;
     public bool isGameOver = false;
+    [SerializeField] private int score = 0;
+    [SerializeField] private TMP_Text scorText;
 
     void Update()
     {
@@ -182,6 +186,8 @@ public class TerrainModifier : MonoBehaviour
         queue.Enqueue(worldPos);
         visited.Add(worldPos);
 
+        int floodFillScore = 0; // Score for the flood fill
+
         while (queue.Count > 0)
         {
             Vector3Int currentPos = queue.Dequeue();
@@ -215,7 +221,14 @@ public class TerrainModifier : MonoBehaviour
             {
                 currentChunk.blocks[x, currentPos.y - 1, z] = (BlockType)mineCount - 1;
             }
+
+            // Increment score for each block
+            floodFillScore++;
         }
+
+        // Update the score
+        score += floodFillScore;
+        scorText.text = "Score: " + score;
 
         // After processing all blocks, update the mesh for each affected chunk
         foreach (var chunkPos in affectedChunks)
@@ -279,7 +292,6 @@ public class TerrainModifier : MonoBehaviour
         }
         return mineCount;
     }
-
 
     private ChunkPos GetChunkPosition(Vector3Int blockPos)
     {
