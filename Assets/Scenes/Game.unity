@@ -766,7 +766,7 @@ MonoBehaviour:
   rayLength: 400
   isGameOver: 0
   score: 0
-  scorText: {fileID: 0}
+  scorText: {fileID: 1706580885}
 --- !u!114 &963194231
 MonoBehaviour:
   m_ObjectHideFlags: 0

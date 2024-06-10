@@ -9,7 +9,7 @@ public class TerrainModifier : MonoBehaviour
     public LayerMask groundLayer;
     public Camera playerCamera;
     public float rayLength = 400;
-    private Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
+    public Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
     public static bool hasFirstClickOccurred = false;
     public bool isGameOver = false;
     [SerializeField] private int score = 0;
@@ -293,7 +293,7 @@ public class TerrainModifier : MonoBehaviour
         return mineCount;
     }
 
-    private ChunkPos GetChunkPosition(Vector3Int blockPos)
+    public ChunkPos GetChunkPosition(Vector3Int blockPos)
     {
         // Calculate the chunk position based on the block position
         return new ChunkPos(Mathf.FloorToInt(blockPos.x / (float)TerrainChunk.chunkWidth) * TerrainChunk.chunkWidth,

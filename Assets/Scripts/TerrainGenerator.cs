@@ -86,7 +86,7 @@ public class TerrainGenerator : MonoBehaviour
 
         if (x >= -4 && x <= 4)
         {
-            if (y == 24 && Random.value < mineProbability && z >= 3) 
+            if (y == 24 && Random.value < mineProbability) 
             {
                 return BlockType.Mine;
             }
