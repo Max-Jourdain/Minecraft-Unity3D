@@ -46,7 +46,7 @@ public class Block
         {BlockType.Unplayed, new Block(Tile.Unplayed, Tile.Unplayed, Tile.Unplayed)},
         {BlockType.Played, new Block(Tile.Played, Tile.Unplayed, Tile.Unplayed)},
         {BlockType.Flag, new Block(Tile.Flag, Tile.Unplayed, Tile.Unplayed)},
-        {BlockType.Mine, new Block(Tile.Unplayed, Tile.Unplayed, Tile.Unplayed)},
+        {BlockType.Mine, new Block(Tile.Color5, Tile.Unplayed, Tile.Unplayed)},
 
         
         // Colors
