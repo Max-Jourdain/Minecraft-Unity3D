@@ -41,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
                         Debug.Log("Game over - Unflagged mine detected");
                         return;
                     }
-                    else if (blockType != BlockType.Mine && terrainModifier.originalBlockStates.ContainsKey(checkPos))
+                    else if (blockType == BlockType.Flag && terrainModifier.originalBlockStates[checkPos] != BlockType.Mine)
                     {
                         Debug.Log("Game over - Wrongful flag detected");
                         return;
