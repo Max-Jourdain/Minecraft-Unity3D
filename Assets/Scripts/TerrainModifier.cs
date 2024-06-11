@@ -19,11 +19,6 @@ public class TerrainModifier : MonoBehaviour
     {
         if (isGameOver) return;
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ResetTerrain();
-        }
-
         if (Input.GetMouseButtonDown(0)) // Left mouse click
         {
             RaycastAndProcess(Input.mousePosition, false);
@@ -49,17 +44,6 @@ public class TerrainModifier : MonoBehaviour
                 ProcessHit(hit.point);
             }
         }
-    }
-
-    public void ResetTerrain()
-    {
-        // reload the current scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-
-        originalBlockStates.Clear();
-        hasFirstClickOccurred = false;
-        Block.UpdateTile(BlockType.Unplayed, Tile.Mine);
-        UpdateVisibleChunks();
     }
 
     private void ProcessRightClick(Vector3 hitPoint)
