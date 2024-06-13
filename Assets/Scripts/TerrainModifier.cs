@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 using TMPro;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class TerrainModifier : MonoBehaviour
 {
@@ -10,10 +8,16 @@ public class TerrainModifier : MonoBehaviour
     public Camera playerCamera;
     public float rayLength = 400;
     public Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
-    public static bool hasFirstClickOccurred = false;
+    public bool hasFirstClickOccurred = false;
     public bool isGameOver = false;
     [SerializeField] private int score = 0;
     [SerializeField] private TMP_Text scorText;
+    TerrainGenerator _terrainGenerator;
+
+    void Awake()
+    {
+        _terrainGenerator = FindObjectOfType<TerrainGenerator>();
+    }
 
     void Update()
     {
@@ -54,7 +58,7 @@ public class TerrainModifier : MonoBehaviour
         Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint);
 
         ChunkPos chunkPos = GetChunkPosition(blockPos);
-        if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
+        if (_terrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
         {
             int localX = blockPos.x - chunkPos.x;
             int localZ = blockPos.z - chunkPos.z;
@@ -88,7 +92,7 @@ public class TerrainModifier : MonoBehaviour
         Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint); // Convert the hit point to a block position
 
         ChunkPos chunkPos = GetChunkPosition(blockPos); // Get the chunk position from the block position
-        if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk)) // Check if the chunk exists
+        if (_terrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk)) // Check if the chunk exists
         {
             int localX = blockPos.x - chunkPos.x;
             int localZ = blockPos.z - chunkPos.z;
@@ -106,11 +110,7 @@ public class TerrainModifier : MonoBehaviour
                 {
                     Debug.Log("Game over");
                     Block.UpdateTile(BlockType.Mine, Tile.Mine);
-
-                    // Disable player movement and control
-                    isGameOver = true;
-
-                    UpdateVisibleChunks(); // Update all visible chunks
+                    UpdateVisibleChunks();
                 }
                 else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
                 {
@@ -126,7 +126,7 @@ public class TerrainModifier : MonoBehaviour
 
     private void UpdateVisibleChunks()
     {
-        foreach (TerrainChunk chunk in TerrainGenerator.chunks.Values)
+        foreach (TerrainChunk chunk in _terrainGenerator.chunks.Values)
         {
             chunk.BuildMesh();
         }
@@ -144,7 +144,7 @@ public class TerrainModifier : MonoBehaviour
                 Vector3Int neighborPos = new Vector3Int(blockPos.x + dx, blockPos.y, blockPos.z + dz);
                 ChunkPos neighborChunkPos = GetChunkPosition(neighborPos);
                 TerrainChunk neighborChunk;
-                if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out neighborChunk))
+                if (_terrainGenerator.chunks.TryGetValue(neighborChunkPos, out neighborChunk))
                 {
                     int localNeighborX = neighborPos.x - neighborChunkPos.x + 1;
                     int localNeighborZ = neighborPos.z - neighborChunkPos.z + 1;
@@ -177,7 +177,7 @@ public class TerrainModifier : MonoBehaviour
             Vector3Int currentPos = queue.Dequeue();
             ChunkPos currentChunkPos = GetChunkPosition(currentPos);
             TerrainChunk currentChunk;
-            if (!TerrainGenerator.chunks.TryGetValue(currentChunkPos, out currentChunk)) continue;
+            if (!_terrainGenerator.chunks.TryGetValue(currentChunkPos, out currentChunk)) continue;
 
             int x = currentPos.x - currentChunkPos.x + 1;
             int z = currentPos.z - currentChunkPos.z + 1;
@@ -217,7 +217,7 @@ public class TerrainModifier : MonoBehaviour
         // After processing all blocks, update the mesh for each affected chunk
         foreach (var chunkPos in affectedChunks)
         {
-            if (TerrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
+            if (_terrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
             {
                 chunk.BuildMesh();
             }
@@ -255,7 +255,7 @@ public class TerrainModifier : MonoBehaviour
                 ChunkPos neighborChunkPos = GetChunkPosition(new Vector3Int(neighborX + chunkPos.x - 1, y, neighborZ + chunkPos.z - 1));
                 TerrainChunk neighborChunk;
 
-                if (TerrainGenerator.chunks.TryGetValue(neighborChunkPos, out neighborChunk))
+                if (_terrainGenerator.chunks.TryGetValue(neighborChunkPos, out neighborChunk))
                 {
                     int localX = (neighborX - 1) % TerrainChunk.chunkWidth + 1;
                     int localZ = (neighborZ - 1) % TerrainChunk.chunkWidth + 1;

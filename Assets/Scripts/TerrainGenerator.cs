@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TerrainGenerator : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject chunksParent;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
     [Range(0f, 1f)][SerializeField] private float mineProbability = 0.1f; 
-    public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
+    public Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
     FastNoise noise = new FastNoise();
     int chunkDistX = 4; // Visible chunks to the side of the player
     int chunkDistZ = 10; // Visible chunks in front of the player, reduced from 6 to 3
@@ -26,21 +27,6 @@ public class TerrainGenerator : MonoBehaviour
     {
         LoadChunks();
     }
-
-    public void ResetTerrain()
-    {
-        foreach (var chunk in chunks.Values)
-        {
-            chunk.gameObject.SetActive(false);
-            pooledChunks.Add(chunk);
-        }
-
-        chunks.Clear();
-        toGenerate.Clear();
-
-        LoadChunks(true); // Passing true to force immediate loading
-    }
-
 
     void BuildChunk(int xPos, int zPos)
     {
@@ -88,6 +74,8 @@ public class TerrainGenerator : MonoBehaviour
         {
             if (y == 24 && z > 2 && Random.value < mineProbability) 
             {
+                Debug.DrawLine(new Vector3(x + 0.5f, y, z + 0.5f), new Vector3(x + 0.5f, y + 20, z + 0.5f), Color.green, 1000);
+
                 return BlockType.Mine;
             }
             else if (y == 24 && z <= 2)
