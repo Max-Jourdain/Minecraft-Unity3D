@@ -27,7 +27,7 @@ public class TerrainModifier : MonoBehaviour
         {
             RaycastAndProcess(Input.mousePosition, false);
         }
-        else if (Input.GetMouseButtonDown(1)) // Right mouse click
+        if (Input.GetKeyDown(KeyCode.G)) // G key press
         {
             RaycastAndProcess(Input.mousePosition, true);
         }

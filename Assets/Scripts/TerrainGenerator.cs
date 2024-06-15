@@ -28,6 +28,11 @@ public class TerrainGenerator : MonoBehaviour
         LoadChunks();
     }
 
+    public void DebugTest()
+    {
+        Debug.Log("DebugTest");
+    }
+
     void BuildChunk(int xPos, int zPos)
     {
         TerrainChunk chunk;
@@ -74,7 +79,7 @@ public class TerrainGenerator : MonoBehaviour
         {
             if (y == 24 && z > 2 && Random.value < mineProbability) 
             {
-                Debug.DrawLine(new Vector3(x + 0.5f, y, z + 0.5f), new Vector3(x + 0.5f, y + 20, z + 0.5f), Color.green, 1000);
+                // Debug.DrawLine(new Vector3(x + 0.5f, y, z + 0.5f), new Vector3(x + 0.5f, y + 20, z + 0.5f), Color.green, 1000);
 
                 return BlockType.Mine;
             }
@@ -130,7 +135,7 @@ public class TerrainGenerator : MonoBehaviour
         int curChunkPosX = Mathf.FloorToInt((player.position.x + chunkSize / 2) / chunkSize) * chunkSize;
         int curChunkPosZ = Mathf.FloorToInt((player.position.z + chunkSize / 2) / chunkSize) * chunkSize;
 
-        Debug.DrawRay(new Vector3(curChunkPosX, 0, curChunkPosZ), Vector3.up * 100, Color.red);
+        // Debug.DrawRay(new Vector3(curChunkPosX, 0, curChunkPosZ), Vector3.up * 100, Color.red);
 
         if(curChunk.x != curChunkPosX || curChunk.z != curChunkPosZ)
         {

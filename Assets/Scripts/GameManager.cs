@@ -6,6 +6,14 @@ public class GameManager : MonoBehaviour
     public PlayerMovement playerMovement;
     public TerrainModifier terrainModifier;
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ResetGame();
+        }
+    }
+
     public void ResetGame()
     {
         Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
