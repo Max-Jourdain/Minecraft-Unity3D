@@ -20,5 +20,7 @@ public class GameManager : MonoBehaviour
         terrainModifier.hasFirstClickOccurred = false;
         playerMovement.ResetPlayerPosition();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+
     }
 }
