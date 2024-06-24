@@ -187,6 +187,7 @@ MonoBehaviour:
     type: 3}
   player: {fileID: 1100592808}
   chunksParent: {fileID: 1314914656}
+  colorFrequencySeed: 0
   colorFrequency: 6
   mineProbability: 0.15
 --- !u!4 &220957753
@@ -650,7 +651,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 85
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -676,13 +677,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.41603222, y: -0, z: -0, w: 0.9093499}
-  m_LocalPosition: {x: 0, y: 13, z: 3.14}
+  m_LocalRotation: {x: 0.33200723, y: -0, z: -0, w: 0.9432769}
+  m_LocalPosition: {x: 0, y: 17.9, z: -3.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1100592808}
-  m_LocalEulerAnglesHint: {x: 49.169, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 38.781, y: 0, z: 0}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -840,7 +841,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transitionSpeed: 10
-  movementDistance: 5
+  movementDistance: 2
 --- !u!23 &1100592806
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -36,7 +36,6 @@ public class TerrainModifier : MonoBehaviour
     private void RaycastAndProcess(Vector3 mousePosition, bool isRightClick)
     {
         Ray ray = playerCamera.ScreenPointToRay(mousePosition);
-        Debug.DrawRay(ray.origin, ray.direction * rayLength, Color.red, 100f);
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
         {
             if (isRightClick)
@@ -109,6 +108,7 @@ public class TerrainModifier : MonoBehaviour
                 if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
                 {
                     Debug.Log("Game over");
+                    isGameOver = true;
                     Block.UpdateTile(BlockType.Mine, Tile.Mine);
                     UpdateVisibleChunks();
                 }

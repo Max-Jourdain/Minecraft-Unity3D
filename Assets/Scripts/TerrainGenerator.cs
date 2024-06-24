@@ -8,6 +8,7 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject terrainChunk;
     public Transform player;
     public GameObject chunksParent;
+    [SerializeField] private int colorFrequencySeed = 0;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
     [Range(0f, 1f)][SerializeField] private float mineProbability = 0.1f; 
     public Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
@@ -20,6 +21,8 @@ public class TerrainGenerator : MonoBehaviour
 
     void Start()
     {
+        colorFrequencySeed = (int)System.DateTime.Now.Ticks;
+        noise.SetSeed(colorFrequencySeed);
         LoadChunks(true);
     }
 
@@ -74,8 +77,6 @@ public class TerrainGenerator : MonoBehaviour
         {
             if (y == 24 && z > 2 && Random.value < mineProbability) 
             {
-                Debug.DrawLine(new Vector3(x + 0.5f, y, z + 0.5f), new Vector3(x + 0.5f, y + 20, z + 0.5f), Color.green, 1000);
-
                 return BlockType.Mine;
             }
             else if (y == 24 && z <= 2)
