@@ -64,9 +64,7 @@ public class Block
         block.top = block.side = block.bottom = tile;
         block.GetPositions();
     }
-    
 }
-
 
 public enum BlockType 
 {
@@ -75,3 +73,4 @@ public enum BlockType
     Unplayed, Played, Mine, Flag,
     Color1, Color2, Color3, Color4, Color5
 }
+

@@ -323,7 +323,7 @@ MonoBehaviour:
   chunksParent: {fileID: 1314914656}
   colorFrequencySeed: 0
   colorFrequency: 6
-  mineProbability: 0.15
+  mineProbability: 0.1
 --- !u!4 &220957753
 Transform:
   m_ObjectHideFlags: 0

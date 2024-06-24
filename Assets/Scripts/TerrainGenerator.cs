@@ -10,7 +10,7 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject chunksParent;
     [SerializeField] private int colorFrequencySeed = 0;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
-    [Range(0f, 1f)][SerializeField] private float mineProbability = 0.1f; 
+    [Range(0.10f, 0.30f)][SerializeField] private float mineProbability = 0.1f; 
     public Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
     FastNoise noise = new FastNoise();
     int chunkDistX = 4; // Visible chunks to the side of the player
