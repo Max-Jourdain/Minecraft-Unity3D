@@ -131,8 +131,6 @@ public class TerrainGenerator : MonoBehaviour
         int curChunkPosX = Mathf.FloorToInt((player.position.x + chunkSize / 2) / chunkSize) * chunkSize;
         int curChunkPosZ = Mathf.FloorToInt((player.position.z + chunkSize / 2) / chunkSize) * chunkSize;
 
-        Debug.DrawRay(new Vector3(curChunkPosX, 0, curChunkPosZ), Vector3.up * 100, Color.red);
-
         if(curChunk.x != curChunkPosX || curChunk.z != curChunkPosZ)
         {
             curChunk.x = curChunkPosX;

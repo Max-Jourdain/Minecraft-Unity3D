@@ -13,6 +13,11 @@ public class TerrainModifier : MonoBehaviour
     [SerializeField] private int score = 0;
     [SerializeField] private TMP_Text scorText;
     TerrainGenerator _terrainGenerator;
+    private float touchStartTime;
+    private float holdThreshold = 0.25f;
+    private bool hasVibrated = false;
+
+    [SerializeField] private TMP_Text debugText;
 
     void Awake()
     {
@@ -23,13 +28,58 @@ public class TerrainModifier : MonoBehaviour
     {
         if (isGameOver) return;
 
-        if (Input.GetMouseButtonDown(0)) // Left mouse click
+        #if UNITY_EDITOR
+        HandleEditorInput();
+        #else
+        HandleMobileInput();
+        #endif
+    }
+
+    private void HandleEditorInput()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
             RaycastAndProcess(Input.mousePosition, false);
         }
-        else if (Input.GetMouseButtonDown(1)) // Right mouse click
+        else if (Input.GetMouseButtonDown(1))
         {
             RaycastAndProcess(Input.mousePosition, true);
+        }
+    }
+
+    private void HandleMobileInput()
+    {
+        if (Input.touchCount > 0)
+        {
+            debugText.text = Input.touchCount.ToString();
+
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                touchStartTime = Time.time;
+                hasVibrated = false; // Reset vibration flag when a new touch begins
+            }
+            else if (touch.phase == TouchPhase.Stationary && Time.time - touchStartTime > holdThreshold && !hasVibrated)
+            {
+                Handheld.Vibrate();
+                hasVibrated = true; // Ensure vibration happens only once per hold
+            }
+            else if (touch.phase == TouchPhase.Ended)
+            {
+                float touchDuration = Time.time - touchStartTime;
+
+                if (touchDuration < holdThreshold)
+                {
+                    RaycastAndProcess(touch.position, false); // Quick tap
+                }
+                else
+                {
+                    RaycastAndProcess(touch.position, true); // Hold
+                }
+
+                hasVibrated = false; // Reset for the next touch
+            }
         }
     }
 
