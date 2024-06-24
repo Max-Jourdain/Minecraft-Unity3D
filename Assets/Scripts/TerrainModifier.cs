@@ -110,6 +110,7 @@ public class TerrainModifier : MonoBehaviour
                     Debug.Log("Game over");
                     isGameOver = true;
                     Block.UpdateTile(BlockType.Mine, Tile.Mine);
+                    Block.UpdateTile(BlockType.Flag, Tile.Mine);
                     UpdateVisibleChunks();
                 }
                 else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 

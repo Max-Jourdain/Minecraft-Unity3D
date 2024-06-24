@@ -14,7 +14,7 @@ public class TerrainGenerator : MonoBehaviour
     public Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
     FastNoise noise = new FastNoise();
     int chunkDistX = 4; // Visible chunks to the side of the player
-    int chunkDistZ = 10; // Visible chunks in front of the player, reduced from 6 to 3
+    int chunkDistZ = 20; // Visible chunks in front of the player, reduced from 6 to 3
     ChunkPos curChunk = new ChunkPos(-1,-1);
     List<TerrainChunk> pooledChunks = new List<TerrainChunk>();
     List<ChunkPos> toGenerate = new List<ChunkPos>();

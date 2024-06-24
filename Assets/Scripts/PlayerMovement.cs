@@ -26,4 +26,14 @@ public class PlayerMovement : MonoBehaviour
 
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, transitionSpeed * Time.deltaTime);
     }
+
+    public void MoveForward()
+    {
+        targetPosition += transform.forward * movementDistance;
+    }
+
+    public void MoveBackward()
+    {
+        targetPosition -= transform.forward * movementDistance;
+    }
 }
