@@ -5,8 +5,8 @@ using UnityEngine;
 public class Block
 {
     public Tile top, side, bottom;
-
     public TilePos topPos, sidePos, bottomPos;
+    public Color[] colors;
 
     public Block(Tile tile)
     {
@@ -57,7 +57,7 @@ public class Block
         {BlockType.Color5, new Block(Tile.Color5, Tile.Color5, Tile.Color5)}
     };
 
-    // function tha twill update the first tile of a blocktype
+    // function that will update the first tile of a blocktype
     public static void UpdateTile(BlockType blockType, Tile tile)
     {
         Block block = blocks[blockType];

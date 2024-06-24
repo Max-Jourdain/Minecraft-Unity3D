@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class TilePos
 {
-    int xPos, yPos;
-
+    public int xPos, yPos;
     Vector2[] uvs;
 
     public TilePos(int xPos, int yPos)
