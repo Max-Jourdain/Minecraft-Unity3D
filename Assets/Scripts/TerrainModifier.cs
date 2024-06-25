@@ -157,19 +157,13 @@ public class TerrainModifier : MonoBehaviour
                 // Normal game logic for handling clicks after the first one
                 if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
                 {
-                    Debug.Log("Game over");
                     isGameOver = true;
                     Block.UpdateTile(BlockType.Mine, Tile.Mine);
-                    Block.UpdateTile(BlockType.Flag, Tile.Mine);
                     UpdateVisibleChunks();
                 }
                 else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
                 {
                     FloodFill(blockPos, localX, localZ);
-                }
-                else
-                {
-                    Debug.Log("Block already played");
                 }
             }
         }
@@ -303,24 +297,30 @@ public class TerrainModifier : MonoBehaviour
 
                 int neighborX = x + dx;
                 int neighborZ = z + dz;
-                ChunkPos neighborChunkPos = GetChunkPosition(new Vector3Int(neighborX + chunkPos.x - 1, y, neighborZ + chunkPos.z - 1));
+                Vector3Int neighborGlobalPos = new Vector3Int(neighborX + chunkPos.x - 1, y, neighborZ + chunkPos.z - 1);
+                ChunkPos neighborChunkPos = GetChunkPosition(neighborGlobalPos);
                 TerrainChunk neighborChunk;
 
                 if (_terrainGenerator.chunks.TryGetValue(neighborChunkPos, out neighborChunk))
                 {
-                    int localX = (neighborX - 1) % TerrainChunk.chunkWidth + 1;
-                    int localZ = (neighborZ - 1) % TerrainChunk.chunkWidth + 1;
+                    int localX = neighborGlobalPos.x - neighborChunkPos.x + 1;
+                    int localZ = neighborGlobalPos.z - neighborChunkPos.z + 1;
 
-                    // Adjust localX and localZ for edge cases
-                    if (localX <= 0) localX += TerrainChunk.chunkWidth;
-                    if (localZ <= 0) localZ += TerrainChunk.chunkWidth;
-                    if (localX > TerrainChunk.chunkWidth) localX -= TerrainChunk.chunkWidth;
-                    if (localZ > TerrainChunk.chunkWidth) localZ -= TerrainChunk.chunkWidth;
+                    // Ensure localX and localZ are within bounds
+                    if (localX < 1 || localX > TerrainChunk.chunkWidth || localZ < 1 || localZ > TerrainChunk.chunkWidth)
+                        continue;
 
                     BlockType neighborBlockType = neighborChunk.blocks[localX, y - 1, localZ];
-                    if (neighborBlockType == BlockType.Mine || neighborBlockType == BlockType.Flag)
+                    if (neighborBlockType == BlockType.Mine)
                     {
                         mineCount++;
+                    }
+                    else if (neighborBlockType == BlockType.Flag)
+                    {
+                        if (originalBlockStates.TryGetValue(neighborGlobalPos, out BlockType originalState) && originalState == BlockType.Mine)
+                        {
+                            mineCount++;
+                        }
                     }
                 }
             }
