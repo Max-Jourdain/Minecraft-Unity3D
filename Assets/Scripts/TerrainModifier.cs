@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using System.Collections;
 
 public class TerrainModifier : MonoBehaviour
 {
@@ -203,8 +204,12 @@ public class TerrainModifier : MonoBehaviour
             }
         }
     }
-
     private void FloodFill(Vector3Int blockPos, int localX, int localZ)
+    {
+        StartCoroutine(FloodFillCoroutine(blockPos, localX, localZ));
+    }
+
+    private IEnumerator FloodFillCoroutine(Vector3Int blockPos, int localX, int localZ)
     {
         HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
         HashSet<ChunkPos> affectedChunks = new HashSet<ChunkPos>(); // Track affected chunks
@@ -216,43 +221,60 @@ public class TerrainModifier : MonoBehaviour
         visited.Add(worldPos);
 
         int floodFillScore = 0; // Score for the flood fill
+        float delay = 0.025f; // Adjust the delay as needed
 
-        while (queue.Count > 0)
+        // Layers of blocks to be processed
+        List<Vector3Int> currentLayer = new List<Vector3Int> { worldPos };
+
+        while (currentLayer.Count > 0)
         {
-            Vector3Int currentPos = queue.Dequeue();
-            ChunkPos currentChunkPos = GetChunkPosition(currentPos);
-            TerrainChunk currentChunk;
-            if (!_terrainGenerator.chunks.TryGetValue(currentChunkPos, out currentChunk)) continue;
+            List<Vector3Int> nextLayer = new List<Vector3Int>();
 
-            int x = currentPos.x - currentChunkPos.x + 1;
-            int z = currentPos.z - currentChunkPos.z + 1;
-
-            if (!IsValidBlock(currentChunk, x, currentPos.y, z)) continue;
-
-            // Add the chunk to the affectedChunks set to ensure it gets updated
-            affectedChunks.Add(currentChunkPos);
-
-            int mineCount = CountMines(currentChunk, x, currentPos.y, z, currentChunkPos);
-
-            if (mineCount == 0)
+            foreach (var currentPos in currentLayer)
             {
-                currentChunk.blocks[x, currentPos.y - 1, z] = BlockType.Played;
-                foreach (var neighbor in GetNeighbors(currentPos))
+                ChunkPos currentChunkPos = GetChunkPosition(currentPos);
+                TerrainChunk currentChunk;
+                if (!_terrainGenerator.chunks.TryGetValue(currentChunkPos, out currentChunk)) continue;
+
+                int x = currentPos.x - currentChunkPos.x + 1;
+                int z = currentPos.z - currentChunkPos.z + 1;
+
+                if (!IsValidBlock(currentChunk, x, currentPos.y, z)) continue;
+
+                // Add the chunk to the affectedChunks set to ensure it gets updated
+                affectedChunks.Add(currentChunkPos);
+
+                int mineCount = CountMines(currentChunk, x, currentPos.y, z, currentChunkPos);
+
+                if (mineCount == 0)
                 {
-                    if (!visited.Contains(neighbor))
+                    currentChunk.blocks[x, currentPos.y - 1, z] = BlockType.Played;
+                    foreach (var neighbor in GetNeighbors(currentPos))
                     {
-                        queue.Enqueue(neighbor);
-                        visited.Add(neighbor);
+                        if (!visited.Contains(neighbor))
+                        {
+                            nextLayer.Add(neighbor);
+                            visited.Add(neighbor);
+                        }
                     }
                 }
-            }
-            else
-            {
-                currentChunk.blocks[x, currentPos.y - 1, z] = (BlockType)mineCount - 1;
+                else
+                {
+                    currentChunk.blocks[x, currentPos.y - 1, z] = (BlockType)mineCount - 1;
+                }
+
+                // Increment score for each block
+                floodFillScore++;
+
+                // Update the mesh for the current chunk
+                currentChunk.BuildMesh();
             }
 
-            // Increment score for each block
-            floodFillScore++;
+            // Move to the next layer
+            currentLayer = nextLayer;
+
+            // Yield execution to create the delay effect
+            yield return new WaitForSeconds(delay);
         }
 
         // Update the score
