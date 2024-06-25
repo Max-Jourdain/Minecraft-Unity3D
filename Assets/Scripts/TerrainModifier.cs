@@ -221,7 +221,7 @@ public class TerrainModifier : MonoBehaviour
         visited.Add(worldPos);
 
         int floodFillScore = 0; // Score for the flood fill
-        float delay = 0.025f; // Adjust the delay as needed
+        float delay = 0.030f; // Adjust the delay as needed
 
         // Layers of blocks to be processed
         List<Vector3Int> currentLayer = new List<Vector3Int> { worldPos };
