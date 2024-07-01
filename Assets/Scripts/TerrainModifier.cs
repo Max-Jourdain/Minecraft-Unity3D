@@ -18,8 +18,6 @@ public class TerrainModifier : MonoBehaviour
     private float holdThreshold = 0.25f;
     private bool hasVibrated = false;
 
-    [SerializeField] private TMP_Text debugText;
-
     void Awake()
     {
         _terrainGenerator = FindObjectOfType<TerrainGenerator>();
@@ -52,8 +50,6 @@ public class TerrainModifier : MonoBehaviour
     {
         if (Input.touchCount > 0)
         {
-            debugText.text = Input.touchCount.ToString();
-
             Touch touch = Input.GetTouch(0);
 
             if (touch.phase == TouchPhase.Began)
