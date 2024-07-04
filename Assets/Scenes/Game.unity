@@ -1690,6 +1690,8 @@ MonoBehaviour:
   isGameOver: 0
   score: 0
   scorText: {fileID: 9041055}
+  explosionVFX: {fileID: 4593184484909914552, guid: 2e1e9506f5904a64b81744324fb7cd50,
+    type: 3}
   gameOverPanel: {fileID: 7733368519154585452}
 --- !u!114 &963194231
 MonoBehaviour:

@@ -18,6 +18,9 @@ public class TerrainModifier : MonoBehaviour
     private float holdThreshold = 0.25f;
     private bool hasVibrated = false;
 
+    [Header("VFX")]
+    [SerializeField] private GameObject explosionVFX;
+
     [Header("Canvas Prefabs")]
     [SerializeField] private GameObject gameOverPanel;
 
@@ -157,13 +160,11 @@ public class TerrainModifier : MonoBehaviour
                 // Normal game logic for handling clicks after the first one
                 if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
                 {
-                    isGameOver = true;
+                    // play explosion vfx
+                    Instantiate(explosionVFX, hitPoint, Quaternion.identity);
 
-                    //! Game Over
-                    gameOverPanel.SetActive(true);
-
-                    Block.UpdateTile(BlockType.Mine, Tile.Mine);
-                    UpdateVisibleChunks();
+                    //! Game over
+                    StartCoroutine(GameOver());
                 }
                 else if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Unplayed) 
                 {
@@ -171,6 +172,15 @@ public class TerrainModifier : MonoBehaviour
                 }
             }
         }
+    }
+
+    IEnumerator GameOver()
+    {
+        isGameOver = true;
+        Block.UpdateTile(BlockType.Mine, Tile.Mine);
+        UpdateVisibleChunks();
+        yield return new WaitForSeconds(1);
+        gameOverPanel.SetActive(true);
     }
 
     private void UpdateVisibleChunks()
