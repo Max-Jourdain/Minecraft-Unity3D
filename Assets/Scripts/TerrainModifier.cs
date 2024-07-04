@@ -18,6 +18,9 @@ public class TerrainModifier : MonoBehaviour
     private float holdThreshold = 0.25f;
     private bool hasVibrated = false;
 
+    [Header("Canvas Prefabs")]
+    [SerializeField] private GameObject gameOverPanel;
+
     void Awake()
     {
         _terrainGenerator = FindObjectOfType<TerrainGenerator>();
@@ -155,6 +158,10 @@ public class TerrainModifier : MonoBehaviour
                 if (chunk.blocks[localX + 1, blockPos.y - 1, localZ + 1] == BlockType.Mine)
                 {
                     isGameOver = true;
+
+                    //! Game Over
+                    gameOverPanel.SetActive(true);
+
                     Block.UpdateTile(BlockType.Mine, Tile.Mine);
                     UpdateVisibleChunks();
                 }
@@ -275,7 +282,7 @@ public class TerrainModifier : MonoBehaviour
 
         // Update the score
         score += floodFillScore;
-        scorText.text = "Score: " + score;
+        scorText.text = score.ToString();
 
         // After processing all blocks, update the mesh for each affected chunk
         foreach (var chunkPos in affectedChunks)
