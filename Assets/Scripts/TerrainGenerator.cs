@@ -10,7 +10,6 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject chunksParent;
     [SerializeField] private int colorFrequencySeed = 0;
     [Range(2f, 8f)][SerializeField] private int colorFrequency = 2;
-    [Range(0.10f, 0.30f)][SerializeField] private float mineProbability = 0.1f; 
     public Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
     FastNoise noise = new FastNoise();
     int chunkDistX = 4; // Visible chunks to the side of the player
@@ -18,9 +17,18 @@ public class TerrainGenerator : MonoBehaviour
     ChunkPos curChunk = new ChunkPos(-1,-1);
     List<TerrainChunk> pooledChunks = new List<TerrainChunk>();
     List<ChunkPos> toGenerate = new List<ChunkPos>();
+    [SerializeField] private Difficulty difficulty;
 
     void Start()
     {
+        // Ensure MainMenuController has been initialized and is not null
+        if (MainMenuController.Instance != null)
+        {
+            // Retrieve and set the selected difficulty
+            Difficulty selectedDifficulty = MainMenuController.Instance.selectedDifficulty;
+            SetDifficulty(selectedDifficulty);
+        }
+
         colorFrequencySeed = (int)System.DateTime.Now.Ticks;
         noise.SetSeed(colorFrequencySeed);
         LoadChunks(true);
@@ -29,6 +37,11 @@ public class TerrainGenerator : MonoBehaviour
     private void Update()
     {
         LoadChunks();
+    }
+
+    public void SetDifficulty(Difficulty difficulty)
+    {
+        this.difficulty = difficulty;
     }
 
     void BuildChunk(int xPos, int zPos)
@@ -75,8 +88,9 @@ public class TerrainGenerator : MonoBehaviour
 
         if (x >= -4 && x <= 4)
         {
-            if (y == 24 && z > 2 && Random.value < mineProbability) 
+            if (y == 24 && z > 2 && Random.value < GetMineProbability()) 
             {
+                Debug.Log(GetMineProbability());
                 return BlockType.Mine;
             }
             else if (y == 24 && z <= 2)
@@ -189,6 +203,25 @@ public class TerrainGenerator : MonoBehaviour
             yield return new WaitForSeconds(.2f);
         }
     }
+
+    float GetMineProbability()
+    {
+        switch (difficulty)
+        {
+            case Difficulty.Very_Easy:
+                return 0.10f;
+            case Difficulty.Easy:
+                return 0.15f;
+            case Difficulty.Medium:
+                return 0.20f;
+            case Difficulty.Hard:
+                return 0.25f;
+            case Difficulty.Impossible:
+                return 0.30f;
+            default:
+                return 0.3f;
+        }
+    }
 }
 
 public struct ChunkPos
@@ -199,4 +232,13 @@ public struct ChunkPos
         this.x = x;
         this.z = z;
     }
+}
+
+public enum Difficulty
+{
+    Very_Easy,
+    Easy,
+    Medium,
+    Hard,
+    Impossible
 }

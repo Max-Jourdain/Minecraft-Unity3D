@@ -179,7 +179,8 @@ public class TerrainModifier : MonoBehaviour
         isGameOver = true;
         Block.UpdateTile(BlockType.Mine, Tile.Mine);
         UpdateVisibleChunks();
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(2);
+        Time.timeScale = 0;
         gameOverPanel.SetActive(true);
     }
 
