@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public TerrainModifier terrainModifier;
 
     [SerializeField] private GameObject loadingScreen;
+    [SerializeField] private GameObject pauseScreen;
 
     public void ResetGame()
     {
@@ -25,6 +26,24 @@ public class GameManager : MonoBehaviour
 
         // Start the loading process asynchronously
         StartCoroutine(LoadSceneAsync());
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0;
+        pauseScreen.SetActive(true);
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
+        pauseScreen.SetActive(false);
+    }
+
+    public void LoadScene(string sceneName)
+    {
+        ResetGame();
+        SceneManager.LoadScene(sceneName);
     }
 
     private IEnumerator LoadSceneAsync()

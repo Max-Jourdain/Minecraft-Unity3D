@@ -12,22 +12,23 @@ public class MainMenuController : MonoBehaviour
     public Difficulty selectedDifficulty;
     public string gameSceneName = "Game";
 
+    private bool isInitialized = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(Instance.gameObject);
         }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-    }
 
-    void Start()
-    {
-        difficultyDropdown.onValueChanged.AddListener(delegate { UpdateSelectedDifficulty(); });
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        if (!isInitialized)
+        {
+            difficultyDropdown.onValueChanged.AddListener(delegate { UpdateSelectedDifficulty(); });
+            isInitialized = true;
+        }
     }
 
     public void StartGame()
