@@ -8,7 +8,10 @@ public class GameManager : MonoBehaviour
     public PlayerMovement playerMovement;
     public TerrainModifier terrainModifier;
 
+
+    [Header("UI Panels")]
     [SerializeField] private GameObject loadingScreen;
+    [SerializeField] public GameObject gameOverScreen;
     [SerializeField] private GameObject pauseScreen;
 
     public void ResetGame()
@@ -26,6 +29,12 @@ public class GameManager : MonoBehaviour
 
         // Start the loading process asynchronously
         StartCoroutine(LoadSceneAsync());
+    }
+
+    public void RewardContinue()
+    {
+        terrainModifier.RewardContinue();
+        gameOverScreen.SetActive(false);
     }
 
     public void PauseGame()

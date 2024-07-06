@@ -14,6 +14,7 @@ public class TerrainModifier : MonoBehaviour
     [SerializeField] private int score = 0;
     [SerializeField] private TMP_Text scorText;
     TerrainGenerator _terrainGenerator;
+    GameManager _gameManager;
     private float touchStartTime;
     private float holdThreshold = 0.25f;
     private bool hasVibrated = false;
@@ -21,12 +22,11 @@ public class TerrainModifier : MonoBehaviour
     [Header("VFX")]
     [SerializeField] private GameObject explosionVFX;
 
-    [Header("Canvas Prefabs")]
-    [SerializeField] private GameObject gameOverPanel;
 
     void Awake()
     {
         _terrainGenerator = FindObjectOfType<TerrainGenerator>();
+        _gameManager = FindObjectOfType<GameManager>();
     }
 
     void Update()
@@ -177,11 +177,19 @@ public class TerrainModifier : MonoBehaviour
     IEnumerator GameOver()
     {
         isGameOver = true;
-        Block.UpdateTile(BlockType.Mine, Tile.Mine);
+        //Block.UpdateTile(BlockType.Mine, Tile.Mine);
         UpdateVisibleChunks();
         yield return new WaitForSeconds(2);
         Time.timeScale = 0;
-        gameOverPanel.SetActive(true);
+        _gameManager.gameOverScreen.SetActive(true);
+    }
+
+    public void RewardContinue()
+    {
+        Time.timeScale = 1;
+        isGameOver = false;
+        Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
+        UpdateVisibleChunks();
     }
 
     private void UpdateVisibleChunks()
