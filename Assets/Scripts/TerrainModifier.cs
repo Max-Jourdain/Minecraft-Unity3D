@@ -23,6 +23,22 @@ public class TerrainModifier : MonoBehaviour
     [SerializeField] private GameObject explosionVFX;
 
 
+    #region Pooling
+    private static ObjectPool<Vector3Int> vector3IntPool = new ObjectPool<Vector3Int>();
+    private Vector3Int GetPooledVector3Int(int x, int y, int z)
+    {
+        var vec = vector3IntPool.Get();
+        vec.Set(x, y, z);
+        return vec;
+    }
+
+    private void ReturnPooledVector3Int(Vector3Int vec)
+    {
+        vector3IntPool.Return(vec);
+    }
+    #endregion
+
+
     void Awake()
     {
         _terrainGenerator = FindObjectOfType<TerrainGenerator>();
@@ -177,28 +193,49 @@ public class TerrainModifier : MonoBehaviour
     IEnumerator GameOver()
     {
         isGameOver = true;
-        //Block.UpdateTile(BlockType.Mine, Tile.Mine);
-        UpdateVisibleChunks();
+        Block.UpdateTile(BlockType.Mine, Tile.Mine);
+        yield return UpdateAllChunks(); // Update all chunks in batches
         yield return new WaitForSeconds(2);
         Time.timeScale = 0;
         _gameManager.gameOverScreen.SetActive(true);
     }
+
+    private IEnumerator UpdateAllChunks()
+    {
+        List<TerrainChunk> chunksToUpdate = new List<TerrainChunk>(_terrainGenerator.chunks.Values);
+
+        int batchSize = 10; // Adjust batch size as needed
+        for (int i = 0; i < chunksToUpdate.Count; i += batchSize)
+        {
+            for (int j = i; j < i + batchSize && j < chunksToUpdate.Count; j++)
+            {
+                chunksToUpdate[j].BuildMesh();
+            }
+            yield return null; // Yield control back to the main thread to avoid frame spikes
+        }
+    }
+
 
     public void RewardContinue()
     {
         Time.timeScale = 1;
         isGameOver = false;
         Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
-        UpdateVisibleChunks();
+        StartCoroutine(UpdateAllChunks()); // Batch update all chunks to remove mines
     }
 
-    private void UpdateVisibleChunks()
+
+    private void UpdateVisibleChunks(HashSet<ChunkPos> affectedChunks)
     {
-        foreach (TerrainChunk chunk in _terrainGenerator.chunks.Values)
+        foreach (var chunkPos in affectedChunks)
         {
-            chunk.BuildMesh();
+            if (_terrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
+            {
+                chunk.BuildMesh();
+            }
         }
     }
+
 
     private void MakeFirstClickSafe(Vector3Int blockPos, int localX, int localZ, TerrainChunk chunk)
     {
@@ -377,5 +414,20 @@ public class TerrainModifier : MonoBehaviour
         // Calculate the chunk position based on the block position
         return new ChunkPos(Mathf.FloorToInt(blockPos.x / (float)TerrainChunk.chunkWidth) * TerrainChunk.chunkWidth,
                             Mathf.FloorToInt(blockPos.z / (float)TerrainChunk.chunkWidth) * TerrainChunk.chunkWidth);
+    }
+}
+
+public class ObjectPool<T> where T : new()
+{
+    private Stack<T> _pool = new Stack<T>();
+
+    public T Get()
+    {
+        return _pool.Count > 0 ? _pool.Pop() : new T();
+    }
+
+    public void Return(T obj)
+    {
+        _pool.Push(obj);
     }
 }
