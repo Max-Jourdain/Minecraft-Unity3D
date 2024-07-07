@@ -22,6 +22,12 @@ public class TerrainModifier : MonoBehaviour
     [Header("VFX")]
     [SerializeField] private GameObject explosionVFX;
 
+    
+    [Header("High Score")]
+    [SerializeField] private int highScore;
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text currentScoreText;
+
 
     #region Pooling
     private static ObjectPool<Vector3Int> vector3IntPool = new ObjectPool<Vector3Int>();
@@ -43,6 +49,9 @@ public class TerrainModifier : MonoBehaviour
     {
         _terrainGenerator = FindObjectOfType<TerrainGenerator>();
         _gameManager = FindObjectOfType<GameManager>();
+
+        // get the high score from player prefs
+        highScore = PlayerPrefs.GetInt("HighScore");
     }
 
     void Update()
@@ -193,6 +202,25 @@ public class TerrainModifier : MonoBehaviour
     IEnumerator GameOver()
     {
         isGameOver = true;
+        currentScoreText.text = score.ToString();
+
+        _gameManager.DisableScoreScreen();
+
+        // Update the high score
+        if (score > highScore)
+        {
+            highScore = score;
+            scoreText.text = highScore.ToString();
+
+            // Save the high score
+            PlayerPrefs.SetInt("HighScore", highScore);
+            PlayerPrefs.Save();
+        }
+        else
+        {
+            scoreText.text = highScore.ToString();
+        }
+
         Block.UpdateTile(BlockType.Mine, Tile.Mine);
         yield return UpdateAllChunks(); // Update all chunks in batches
         yield return new WaitForSeconds(2);
@@ -223,19 +251,6 @@ public class TerrainModifier : MonoBehaviour
         Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
         StartCoroutine(UpdateAllChunks()); // Batch update all chunks to remove mines
     }
-
-
-    private void UpdateVisibleChunks(HashSet<ChunkPos> affectedChunks)
-    {
-        foreach (var chunkPos in affectedChunks)
-        {
-            if (_terrainGenerator.chunks.TryGetValue(chunkPos, out TerrainChunk chunk))
-            {
-                chunk.BuildMesh();
-            }
-        }
-    }
-
 
     private void MakeFirstClickSafe(Vector3Int blockPos, int localX, int localZ, TerrainChunk chunk)
     {

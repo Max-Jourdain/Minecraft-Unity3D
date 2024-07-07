@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject loadingScreen;
     [SerializeField] public GameObject gameOverScreen;
     [SerializeField] private GameObject pauseScreen;
+    [SerializeField] private GameObject scoreScreen;
 
     public void ResetGame()
     {
@@ -35,6 +36,11 @@ public class GameManager : MonoBehaviour
     {
         terrainModifier.RewardContinue();
         gameOverScreen.SetActive(false);
+    }
+
+    public void DisableScoreScreen()
+    {
+        scoreScreen.SetActive(false);
     }
 
     public void PauseGame()
