@@ -204,6 +204,7 @@ public class TerrainModifier : MonoBehaviour
         isGameOver = true;
         currentScoreText.text = score.ToString();
 
+        // Disable the score screen and show the game over screen
         _gameManager.DisableScoreScreen();
 
         // Update the high score
@@ -224,8 +225,8 @@ public class TerrainModifier : MonoBehaviour
         Block.UpdateTile(BlockType.Mine, Tile.Mine);
         yield return UpdateAllChunks(); // Update all chunks in batches
         yield return new WaitForSeconds(2);
+        _gameManager.GameOver();
         Time.timeScale = 0;
-        _gameManager.gameOverScreen.SetActive(true);
     }
 
     private IEnumerator UpdateAllChunks()

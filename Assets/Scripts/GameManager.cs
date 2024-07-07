@@ -32,15 +32,14 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoadSceneAsync());
     }
 
-    public void RewardContinue()
-    {
-        terrainModifier.RewardContinue();
-        gameOverScreen.SetActive(false);
-    }
-
     public void DisableScoreScreen()
     {
-        scoreScreen.SetActive(false);
+        StartCoroutine(FadeScreen(scoreScreen.GetComponent<CanvasGroup>(), 0.5f, false));
+    }
+
+    public void GameOver()
+    {
+        gameOverScreen.SetActive(true);
     }
 
     public void PauseGame()
@@ -74,5 +73,25 @@ public class GameManager : MonoBehaviour
 
         // Hide the loading screen
         loadingScreen.SetActive(false);
+    }
+
+    private IEnumerator FadeScreen(CanvasGroup canvasGroup, float duration, bool fadeIn)
+    {
+        float elapsedTime = 0f;
+        float startAlpha = fadeIn ? 0f : 1f;
+        float targetAlpha = fadeIn ? 1f : 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+            yield return null;
+        }
+
+        if (!fadeIn)
+        {
+            canvasGroup.gameObject.SetActive(false);
+        }
     }
 }

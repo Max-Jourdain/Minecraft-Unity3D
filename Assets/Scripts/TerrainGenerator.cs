@@ -212,14 +212,14 @@ public class TerrainGenerator : MonoBehaviour
                 return 0.10f;
             case Difficulty.Easy:
                 return 0.15f;
-            case Difficulty.Medium:
-                return 0.20f;
+            case Difficulty.Intermediate:
+                return 0.18f;
             case Difficulty.Hard:
-                return 0.25f;
-            case Difficulty.Impossible:
-                return 0.30f;
+                return 0.20f;
+            case Difficulty.Expert:
+                return 0.22f;
             default:
-                return 0.3f;
+                return 0.10f;
         }
     }
 }
@@ -238,7 +238,7 @@ public enum Difficulty
 {
     Very_Easy,
     Easy,
-    Medium,
+    Intermediate,
     Hard,
-    Impossible
+    Expert
 }

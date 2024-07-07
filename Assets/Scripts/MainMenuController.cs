@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class MainMenuController : MonoBehaviour
 {
     public static MainMenuController Instance { get; private set; }
-    public TMP_Dropdown difficultyDropdown;
+    public Slider difficultySlider;
     public Difficulty selectedDifficulty;
     public string gameSceneName = "Game";
 
@@ -26,7 +26,7 @@ public class MainMenuController : MonoBehaviour
 
         if (!isInitialized)
         {
-            difficultyDropdown.onValueChanged.AddListener(delegate { UpdateSelectedDifficulty(); });
+            difficultySlider.onValueChanged.AddListener(delegate { UpdateSelectedDifficulty(); });
             isInitialized = true;
         }
     }
@@ -38,6 +38,6 @@ public class MainMenuController : MonoBehaviour
 
     public void UpdateSelectedDifficulty()
     {
-        selectedDifficulty = (Difficulty)difficultyDropdown.value;
+        selectedDifficulty = (Difficulty)Mathf.RoundToInt(difficultySlider.value);
     }
 }
