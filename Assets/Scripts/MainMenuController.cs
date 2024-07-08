@@ -9,10 +9,13 @@ public class MainMenuController : MonoBehaviour
 {
     public static MainMenuController Instance { get; private set; }
     public Slider difficultySlider;
-    public Difficulty selectedDifficulty;
     public string gameSceneName = "Game";
-
     private bool isInitialized = false;
+    public int selectedDifficulty = 0;
+    [SerializeField] private TMP_Text difficultyPercentText;
+    [SerializeField] private Gradient gradient;
+    [SerializeField] private Image fillImage;
+    [SerializeField] private TMP_Text difficultyTextValue;
 
     private void Awake()
     {
@@ -31,13 +34,51 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // Load the saved difficulty
+        selectedDifficulty = PlayerPrefs.GetInt("Difficulty");
+        difficultySlider.value = selectedDifficulty;
+        UpdateSelectedDifficulty();
+    }
+
     public void StartGame()
     {
+        // Save the current difficulty
+        PlayerPrefs.SetInt("Difficulty", selectedDifficulty);
+        PlayerPrefs.Save();
+
         SceneManager.LoadScene(gameSceneName);
     }
 
     public void UpdateSelectedDifficulty()
     {
-        selectedDifficulty = (Difficulty)Mathf.RoundToInt(difficultySlider.value);
+        selectedDifficulty = (int)difficultySlider.value;
+        float percentage = difficultySlider.normalizedValue;
+        Color color = gradient.Evaluate(percentage);
+
+        string difficultyLabel = "";
+
+        if (selectedDifficulty < 12)
+        {
+            difficultyLabel = "Easy";
+        }
+        else if (selectedDifficulty >= 12 && selectedDifficulty <= 15)
+        {
+            difficultyLabel = "Intermediate";
+        }
+        else if (selectedDifficulty > 15 && selectedDifficulty <= 20)
+        {
+            difficultyLabel = "Hard";
+        }
+        else
+        {
+            difficultyLabel = "Expert";
+        }
+
+        difficultyTextValue.text = "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + difficultyLabel + "</color>";
+        difficultyPercentText.text = selectedDifficulty.ToString() + "%";
+
+        fillImage.color = color;
     }
 }

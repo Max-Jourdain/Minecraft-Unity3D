@@ -17,7 +17,7 @@ public class TerrainGenerator : MonoBehaviour
     ChunkPos curChunk = new ChunkPos(-1,-1);
     List<TerrainChunk> pooledChunks = new List<TerrainChunk>();
     List<ChunkPos> toGenerate = new List<ChunkPos>();
-    [SerializeField] private Difficulty difficulty;
+    [SerializeField] int mineProbability = 5;
 
     void Start()
     {
@@ -25,8 +25,8 @@ public class TerrainGenerator : MonoBehaviour
         if (MainMenuController.Instance != null)
         {
             // Retrieve and set the selected difficulty
-            Difficulty selectedDifficulty = MainMenuController.Instance.selectedDifficulty;
-            SetDifficulty(selectedDifficulty);
+            mineProbability = MainMenuController.Instance.selectedDifficulty;
+            SetDifficulty(mineProbability);
         }
 
         colorFrequencySeed = (int)System.DateTime.Now.Ticks;
@@ -39,9 +39,9 @@ public class TerrainGenerator : MonoBehaviour
         LoadChunks();
     }
 
-    public void SetDifficulty(Difficulty difficulty)
+    public void SetDifficulty(int difficulty)
     {
-        this.difficulty = difficulty;
+        mineProbability = difficulty;
     }
 
     void BuildChunk(int xPos, int zPos)
@@ -88,9 +88,8 @@ public class TerrainGenerator : MonoBehaviour
 
         if (x >= -4 && x <= 4)
         {
-            if (y == 24 && z > 2 && Random.value < GetMineProbability()) 
+            if (y == 24 && z > 2 && Random.value < mineProbability / 100f)
             {
-                Debug.Log(GetMineProbability());
                 return BlockType.Mine;
             }
             else if (y == 24 && z <= 2)
@@ -203,25 +202,6 @@ public class TerrainGenerator : MonoBehaviour
             yield return new WaitForSeconds(.2f);
         }
     }
-
-    float GetMineProbability()
-    {
-        switch (difficulty)
-        {
-            case Difficulty.Very_Easy:
-                return 0.10f;
-            case Difficulty.Easy:
-                return 0.15f;
-            case Difficulty.Intermediate:
-                return 0.18f;
-            case Difficulty.Hard:
-                return 0.20f;
-            case Difficulty.Expert:
-                return 0.22f;
-            default:
-                return 0.10f;
-        }
-    }
 }
 
 public struct ChunkPos
@@ -234,11 +214,3 @@ public struct ChunkPos
     }
 }
 
-public enum Difficulty
-{
-    Very_Easy,
-    Easy,
-    Intermediate,
-    Hard,
-    Expert
-}
