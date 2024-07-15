@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public GameObject gameOverScreen;
     [SerializeField] private GameObject pauseScreen;
     [SerializeField] private GameObject scoreScreen;
+    [SerializeField] private GameObject settingsScreen;
 
     public void ResetGame()
     {
@@ -42,16 +43,14 @@ public class GameManager : MonoBehaviour
         gameOverScreen.SetActive(true);
     }
 
-    public void PauseGame()
+    public void ShowSettings()
     {
-        Time.timeScale = 0;
-        pauseScreen.SetActive(true);
+        settingsScreen.gameObject.SetActive(true);
     }
 
-    public void ResumeGame()
+    public void HideSettings()
     {
-        Time.timeScale = 1;
-        pauseScreen.SetActive(false);
+        settingsScreen.gameObject.SetActive(false);
     }
 
     public void LoadScene(string sceneName)

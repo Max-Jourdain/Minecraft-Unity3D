@@ -165,6 +165,9 @@ public class TerrainModifier : MonoBehaviour
 
     private void ProcessHit(Vector3 hitPoint)
     {
+        // Block UI raycast
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
+
         Vector3 adjustedHitPoint = hitPoint + new Vector3(0f, 0.01f, 0f); // Adjust the hit point to ensure it's inside the block
         Vector3Int blockPos = Vector3Int.FloorToInt(adjustedHitPoint); // Convert the hit point to a block position
 

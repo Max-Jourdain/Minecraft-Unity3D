@@ -59,15 +59,15 @@ public class MainMenuController : MonoBehaviour
 
         string difficultyLabel = "";
 
-        if (selectedDifficulty < 12)
+        if (selectedDifficulty < 13)
         {
             difficultyLabel = "Easy";
         }
-        else if (selectedDifficulty >= 12 && selectedDifficulty <= 15)
+        else if (selectedDifficulty >= 13 && selectedDifficulty < 16)
         {
             difficultyLabel = "Intermediate";
         }
-        else if (selectedDifficulty > 15 && selectedDifficulty <= 20)
+        else if (selectedDifficulty >= 16 && selectedDifficulty < 19)
         {
             difficultyLabel = "Hard";
         }
@@ -75,7 +75,6 @@ public class MainMenuController : MonoBehaviour
         {
             difficultyLabel = "Expert";
         }
-
         difficultyTextValue.text = "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + difficultyLabel + "</color>";
         difficultyPercentText.text = selectedDifficulty.ToString() + "%";
 
