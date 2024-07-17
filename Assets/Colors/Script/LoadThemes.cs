@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System.IO;
 
 public class LoadThemes : MonoBehaviour
 {
     public ColorPalette[] themes; // Array of themes
     public GameObject themePrefab; // Prefab for the theme object
     public Transform scrollViewContent; // ScrollView content transform
-    public GameObject ToggleGroup; // Toggle group for the themes
+    public GameObject toggleGroup; // Toggle group for the themes
+    private const string SelectedThemeKey = "SelectedTheme";
 
     void Start()
     {
         LoadInThemes();
+        LoadSelectedTheme();
     }
 
     void LoadInThemes()
     {
         foreach (ColorPalette theme in themes)
         {
-
             GameObject themeObject = Instantiate(themePrefab, scrollViewContent);
             themeObject.transform.Find("ThemeName").GetComponent<TMP_Text>().text = theme.paletteName;
 
@@ -39,7 +39,42 @@ public class LoadThemes : MonoBehaviour
             }
 
             // Assign the theme object to the ToggleGroup
-            themeObject.GetComponent<Toggle>().group = ToggleGroup.GetComponent<ToggleGroup>();
+            Toggle toggle = themeObject.GetComponent<Toggle>();
+            toggle.group = toggleGroup.GetComponent<ToggleGroup>();
+
+            // Add listener to the toggle to save the selected theme
+            toggle.onValueChanged.AddListener((isOn) =>
+            {
+                if (isOn)
+                {
+                    SaveSelectedTheme(theme.paletteName);
+                    ToggleChangeEvent.ToggleChanged(theme.paletteName);
+                }
+            });
+        }
+    }
+
+    void SaveSelectedTheme(string themeName)
+    {
+        PlayerPrefs.SetString(SelectedThemeKey, themeName);
+        PlayerPrefs.Save();
+    }
+
+    void LoadSelectedTheme()
+    {
+        string selectedThemeName = PlayerPrefs.GetString(SelectedThemeKey, null);
+        if (!string.IsNullOrEmpty(selectedThemeName))
+        {
+            Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
+            foreach (Toggle toggle in toggles)
+            {
+                TMP_Text themeNameText = toggle.GetComponentInChildren<TMP_Text>();
+                if (themeNameText != null && themeNameText.text == selectedThemeName)
+                {
+                    toggle.isOn = true;
+                    break;
+                }
+            }
         }
     }
 }
