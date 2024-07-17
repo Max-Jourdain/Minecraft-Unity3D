@@ -6,6 +6,7 @@ using System;
 public class Settings : MonoBehaviour
 {
     private const string Theme_SelectedToggleKey = "Theme_SelectedToggle";
+    private const string Difficulty_SelectedToggleKey = "Difficulty_SelectedToggle";
 
     private void OnEnable()
     {
@@ -21,12 +22,14 @@ public class Settings : MonoBehaviour
     private void SaveSettings(string toggleName)
     {
         PlayerPrefs.SetString(Theme_SelectedToggleKey, toggleName);
+        PlayerPrefs.SetString(Difficulty_SelectedToggleKey, toggleName);
         PlayerPrefs.Save();
     }
 
     private void LoadSettings()
     {
         string selectedToggleName = PlayerPrefs.GetString(Theme_SelectedToggleKey, null);
+
         if (!string.IsNullOrEmpty(selectedToggleName))
         {
             ToggleGroup toggleGroup = FindObjectOfType<ToggleGroup>();
@@ -44,11 +47,6 @@ public class Settings : MonoBehaviour
             }
         }
     }
-
-    public void LoadNextScene(string sceneName)
-    {
-        SceneManager.LoadScene(sceneName);
-    }
 }
 
 public static class ToggleChangeEvent
@@ -58,5 +56,6 @@ public static class ToggleChangeEvent
     public static void ToggleChanged(string toggleName)
     {
         OnToggleChanged?.Invoke(toggleName);
+        Debug.Log("Toggle changed: " + toggleName);
     }
 }
