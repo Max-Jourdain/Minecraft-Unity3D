@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using System.Collections;
+using CandyCoded.HapticFeedback;
 
 public class TerrainModifier : MonoBehaviour
 {
@@ -11,8 +12,6 @@ public class TerrainModifier : MonoBehaviour
     public Dictionary<Vector3Int, BlockType> originalBlockStates = new Dictionary<Vector3Int, BlockType>();
     public bool hasFirstClickOccurred = false;
     public bool isGameOver = false;
-    [SerializeField] private int score = 0;
-    [SerializeField] private TMP_Text scorText;
     TerrainGenerator _terrainGenerator;
     GameManager _gameManager;
     private float touchStartTime;
@@ -23,10 +22,11 @@ public class TerrainModifier : MonoBehaviour
     [SerializeField] private GameObject explosionVFX;
 
     
-    [Header("High Score")]
-    [SerializeField] private int highScore;
+    [Header("Scores")]
+    [SerializeField] private int highScore = 0;
+    [SerializeField] private int score = 0;
     [SerializeField] private TMP_Text scoreText;
-    [SerializeField] private TMP_Text currentScoreText;
+    [SerializeField] private TMP_Text highScoreText;
 
 
     #region Pooling
@@ -52,6 +52,7 @@ public class TerrainModifier : MonoBehaviour
 
         // get the high score from player prefs
         highScore = PlayerPrefs.GetInt("HighScore");
+        highScoreText.text = highScore.ToString();
     }
 
     void Update()
@@ -79,6 +80,9 @@ public class TerrainModifier : MonoBehaviour
 
     private void HandleMobileInput()
     {
+        // only mask over terrain
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
+
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -89,8 +93,13 @@ public class TerrainModifier : MonoBehaviour
                 hasVibrated = false; // Reset vibration flag when a new touch begins
             }
             else if (touch.phase == TouchPhase.Stationary && Time.time - touchStartTime > holdThreshold && !hasVibrated)
-            {
-                Handheld.Vibrate();
+            {   
+                // Haptic feedback
+                if (_gameManager.IsVibrationEnabled())
+                {
+                    HapticFeedback.MediumFeedback();
+                }
+
                 hasVibrated = true; // Ensure vibration happens only once per hold
             }
             else if (touch.phase == TouchPhase.Ended)
@@ -113,6 +122,9 @@ public class TerrainModifier : MonoBehaviour
 
     private void RaycastAndProcess(Vector3 mousePosition, bool isRightClick)
     {
+        // block over UI
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
+
         Ray ray = playerCamera.ScreenPointToRay(mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
         {
@@ -205,32 +217,25 @@ public class TerrainModifier : MonoBehaviour
     IEnumerator GameOver()
     {
         isGameOver = true;
-        currentScoreText.text = score.ToString();
-
-        // Disable the score screen and show the game over screen
-        _gameManager.DisableScoreScreen();
+        scoreText.text = score.ToString();
 
         // Update the high score
         if (score > highScore)
         {
             highScore = score;
-            scoreText.text = highScore.ToString();
+            highScoreText.text = highScore.ToString();
 
             // Save the high score
             PlayerPrefs.SetInt("HighScore", highScore);
             PlayerPrefs.Save();
         }
-        else
-        {
-            scoreText.text = highScore.ToString();
-        }
 
         Block.UpdateTile(BlockType.Mine, Tile.Mine);
         yield return UpdateAllChunks(); // Update all chunks in batches
         yield return new WaitForSeconds(2);
-        _gameManager.GameOver();
         Time.timeScale = 0;
     }
+
 
     private IEnumerator UpdateAllChunks()
     {
@@ -245,15 +250,6 @@ public class TerrainModifier : MonoBehaviour
             }
             yield return null; // Yield control back to the main thread to avoid frame spikes
         }
-    }
-
-
-    public void RewardContinue()
-    {
-        Time.timeScale = 1;
-        isGameOver = false;
-        Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
-        StartCoroutine(UpdateAllChunks()); // Batch update all chunks to remove mines
     }
 
     private void MakeFirstClickSafe(Vector3Int blockPos, int localX, int localZ, TerrainChunk chunk)
@@ -357,7 +353,7 @@ public class TerrainModifier : MonoBehaviour
 
         // Update the score
         score += floodFillScore;
-        scorText.text = score.ToString();
+        scoreText.text = score.ToString();
 
         // After processing all blocks, update the mesh for each affected chunk
         foreach (var chunkPos in affectedChunks)

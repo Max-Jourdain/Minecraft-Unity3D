@@ -11,36 +11,49 @@ public class GameManager : MonoBehaviour
 
     [Header("UI Panels")]
     [SerializeField] private GameObject loadingScreen;
-    [SerializeField] public GameObject gameOverScreen;
     [SerializeField] private GameObject pauseScreen;
     [SerializeField] private GameObject scoreScreen;
     [SerializeField] private GameObject settingsScreen;
 
-    public void ResetGame()
+    [Header("Settings")]
+    [SerializeField] private Toggle vibrationToggle;
+    [SerializeField] private Toggle soundToggle;
+
+    private const string VibrationPrefKey = "Vibration";
+    private const string SoundPrefKey = "Sound";
+
+    void Start()
     {
-        Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
-        Time.timeScale = 1;
+        // Load saved settings
+        vibrationToggle.isOn = PlayerPrefs.GetInt(VibrationPrefKey, 1) == 1;
+        soundToggle.isOn = PlayerPrefs.GetInt(SoundPrefKey, 1) == 1;
 
-        terrainModifier.hasFirstClickOccurred = false;
-        terrainModifier.isGameOver = false;
+        // Add listeners to handle toggle changes
+        vibrationToggle.onValueChanged.AddListener(OnVibrationToggleChanged);
+        soundToggle.onValueChanged.AddListener(OnSoundToggleChanged);
+    }
 
-        playerMovement.ResetPlayerPosition();
+    private void OnVibrationToggleChanged(bool isOn)
+    {
+        PlayerPrefs.SetInt(VibrationPrefKey, isOn ? 1 : 0);
+        PlayerPrefs.Save();
+    }
 
-        // Show the loading screen
-        loadingScreen.SetActive(true);
+    private void OnSoundToggleChanged(bool isOn)
+    {
+        PlayerPrefs.SetInt(SoundPrefKey, isOn ? 1 : 0);
+        PlayerPrefs.Save();
+    }
 
-        // Start the loading process asynchronously
-        StartCoroutine(LoadSceneAsync());
+    // get state of vibration toggle
+    public bool IsVibrationEnabled()
+    {
+        return vibrationToggle.isOn;
     }
 
     public void DisableScoreScreen()
     {
         StartCoroutine(FadeScreen(scoreScreen.GetComponent<CanvasGroup>(), 0.5f, false));
-    }
-
-    public void GameOver()
-    {
-        gameOverScreen.SetActive(true);
     }
 
     public void ShowSettings()
@@ -72,6 +85,23 @@ public class GameManager : MonoBehaviour
 
         // Hide the loading screen
         loadingScreen.SetActive(false);
+    }
+
+    public void ResetGame()
+    {
+        Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
+        Time.timeScale = 1;
+
+        terrainModifier.hasFirstClickOccurred = false;
+        terrainModifier.isGameOver = false;
+
+        playerMovement.ResetPlayerPosition();
+
+        // Show the loading screen
+        loadingScreen.SetActive(true);
+        
+        // Start the loading process asynchronously
+        StartCoroutine(LoadSceneAsync());
     }
 
     private IEnumerator FadeScreen(CanvasGroup canvasGroup, float duration, bool fadeIn)
