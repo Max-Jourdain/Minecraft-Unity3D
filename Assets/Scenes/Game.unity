@@ -2040,10 +2040,10 @@ MonoBehaviour:
   rayLength: 400
   hasFirstClickOccurred: 0
   isGameOver: 0
-  score: 0
   explosionVFX: {fileID: 4593184484909914552, guid: 2e1e9506f5904a64b81744324fb7cd50,
     type: 3}
   highScore: 0
+  score: 0
   scoreText: {fileID: 1166646366}
   highScoreText: {fileID: 2181207538322811730}
 --- !u!114 &963194231

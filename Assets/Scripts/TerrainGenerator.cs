@@ -17,23 +17,11 @@ public class TerrainGenerator : MonoBehaviour
     ChunkPos curChunk = new ChunkPos(-1,-1);
     List<TerrainChunk> pooledChunks = new List<TerrainChunk>();
     List<ChunkPos> toGenerate = new List<ChunkPos>();
-    private int mineProbability = 0;
+    private float mineProbability = 0.15f;
 
 
     void Start()
     {
-        // Ensure MainMenuController has been initialized and is not null
-        if (MainMenuController.Instance != null)
-        {
-            // Set the mine probability based on the selected difficulty
-            mineProbability = MainMenuController.Instance.mineProbability;
-
-            // pick a random number +- 2 from the selected difficulty
-            mineProbability += Random.Range(-2, 3);
-
-            Debug.Log("Mine Probability: " + mineProbability);
-        }
-
         colorFrequencySeed = (int)System.DateTime.Now.Ticks;
         noise.SetSeed(colorFrequencySeed);
         LoadChunks(true);
@@ -91,7 +79,7 @@ public class TerrainGenerator : MonoBehaviour
 
         if (x >= -4 && x <= 4)
         {
-            if (y == 24 && z > 2 && Random.value < mineProbability / 100f)
+            if (y == 24 && z > 2 && Random.value < mineProbability)
             {
                 Debug.Log(mineProbability);
                 return BlockType.Mine;

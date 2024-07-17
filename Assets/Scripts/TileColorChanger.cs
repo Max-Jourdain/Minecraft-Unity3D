@@ -22,15 +22,20 @@ public class TileColorChanger : MonoBehaviour
 
     void Start()
     {
-        if (colorPalettes.Length > 0)
+        // Load the selected toggle name from PlayerPrefs
+        string selectedToggle = PlayerPrefs.GetString("Theme_SelectedToggle", "DefaultToggle");
+        
+        // Find the corresponding color palette
+        foreach (var palette in colorPalettes)
         {
-            SetColorPalette(colorPalettes[0]); // Initialize with the first palette
+            if (palette.name == selectedToggle)
+            {
+                currentPalette = palette;
+                break;
+            }
         }
-    }
 
-    public void SetColorPalette(ColorPalette palette)
-    {
-        currentPalette = palette;
+        // Apply the color palette
         ApplyColorPalette();
     }
 
@@ -81,21 +86,5 @@ public class TileColorChanger : MonoBehaviour
         {
             baseMaterial.mainTexture = atlas;
         }
-    }
-
-    // Method to switch to the next palette
-    public void NextPalette()
-    {
-        int currentIndex = System.Array.IndexOf(colorPalettes, currentPalette);
-        int nextIndex = (currentIndex + 1) % colorPalettes.Length;
-        SetColorPalette(colorPalettes[nextIndex]);
-    }
-
-    // Method to switch to the previous palette
-    public void PreviousPalette()
-    {
-        int currentIndex = System.Array.IndexOf(colorPalettes, currentPalette);
-        int previousIndex = (currentIndex - 1 + colorPalettes.Length) % colorPalettes.Length;
-        SetColorPalette(colorPalettes[previousIndex]);
     }
 }
