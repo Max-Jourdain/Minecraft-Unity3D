@@ -48,7 +48,7 @@ public class LoadThemes : MonoBehaviour
                 if (isOn)
                 {
                     SaveSelectedTheme(theme.paletteName);
-                    ToggleChangeEvent.ToggleChanged(theme.paletteName);
+                    ToggleChangeEvent.ToggleChanged(ToggleType.Theme, theme.paletteName);
                 }
             });
         }

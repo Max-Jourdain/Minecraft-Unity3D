@@ -19,10 +19,16 @@ public class Settings : MonoBehaviour
         ToggleChangeEvent.OnToggleChanged -= SaveSettings;
     }
 
-    private void SaveSettings(string toggleName)
+    private void SaveSettings(ToggleType type, string toggleName)
     {
-        PlayerPrefs.SetString(Theme_SelectedToggleKey, toggleName);
-        PlayerPrefs.SetString(Difficulty_SelectedToggleKey, toggleName);
+        if (type == ToggleType.Theme)
+        {
+            PlayerPrefs.SetString(Theme_SelectedToggleKey, toggleName);
+        }
+        else if (type == ToggleType.Difficulty)
+        {
+            PlayerPrefs.SetString(Difficulty_SelectedToggleKey, toggleName);
+        }
         PlayerPrefs.Save();
     }
 
@@ -49,13 +55,19 @@ public class Settings : MonoBehaviour
     }
 }
 
+public enum ToggleType
+{
+    Theme,
+    Difficulty
+}
+
 public static class ToggleChangeEvent
 {
-    public static event Action<string> OnToggleChanged;
+    public static event Action<ToggleType, string> OnToggleChanged;
 
-    public static void ToggleChanged(string toggleName)
+    public static void ToggleChanged(ToggleType type, string toggleName)
     {
-        OnToggleChanged?.Invoke(toggleName);
-        Debug.Log("Toggle changed: " + toggleName);
+        OnToggleChanged?.Invoke(type, toggleName);
+        Debug.Log($"Toggle changed: {toggleName}, Type: {type}");
     }
 }
