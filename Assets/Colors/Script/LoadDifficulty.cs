@@ -34,16 +34,16 @@ public class LoadDifficulty : MonoBehaviour
             {
                 if (isOn)
                 {
-                    SaveSelectedDifficulties(dif.difficultyName);
+                    SaveSelectedDifficulties(dif.minesProbability);
                     ToggleChangeEvent.ToggleChanged(ToggleType.Difficulty, dif.difficultyName);
                 }
             });
         }
     }
 
-    void SaveSelectedDifficulties(string difficultyName)
+    void SaveSelectedDifficulties(float minesProbability)
     {
-        PlayerPrefs.SetString(SelectedDifficultiesKey, difficultyName);
+        PlayerPrefs.SetFloat(SelectedDifficultiesKey, minesProbability);
         PlayerPrefs.Save();
     }
 

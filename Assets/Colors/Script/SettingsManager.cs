@@ -29,6 +29,7 @@ public class Settings : MonoBehaviour
         {
             PlayerPrefs.SetString(Difficulty_SelectedToggleKey, toggleName);
         }
+        
         PlayerPrefs.Save();
     }
 

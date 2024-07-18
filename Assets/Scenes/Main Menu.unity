@@ -4827,7 +4827,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6a36da76b1214b1bb1fba58c59d6ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  popupPrefab: {fileID: 2117541125360940276, guid: 87a4d2c7e1f0e45e5974e043431d0c38,
+  popupPrefab: {fileID: 2117541125360940276, guid: b814216aa1b754742aaa3d705a6e1008,
     type: 3}
 --- !u!1 &977331415
 GameObject:
@@ -5493,6 +5493,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 570fc0040ad0b4bc09756445a9ea7d9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toggle: {fileID: 0}
 --- !u!1001 &1120769941
 PrefabInstance:
   m_ObjectHideFlags: 0

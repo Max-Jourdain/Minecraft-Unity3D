@@ -225,6 +225,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   difficulties:
   - {fileID: 11400000, guid: d5dd96b1ef1d442d789c17b5c16c72b1, type: 2}
+  - {fileID: 11400000, guid: 542615cc7bc4d4d0f8392523b4e68317, type: 2}
+  - {fileID: 11400000, guid: a0ce76fa80bd7439e882b91d853984ea, type: 2}
   - {fileID: 11400000, guid: 979c79ac93783498e98a10f74f2102ec, type: 2}
   difficultiesPrefab: {fileID: 1022713460775433949, guid: 794c06c232ddb45b298865874f1cb9e7,
     type: 3}
