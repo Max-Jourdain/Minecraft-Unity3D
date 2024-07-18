@@ -11,6 +11,7 @@ public class LoadDifficulty : MonoBehaviour
     public Transform scrollViewContent; 
     public GameObject toggleGroup; 
     private const string SelectedDifficultiesKey = "SelectedDifficulties";
+    private const string SelectedDifficultyNameKey = "SelectedDifficultyName";
 
     void Start()
     {
@@ -34,29 +35,34 @@ public class LoadDifficulty : MonoBehaviour
             {
                 if (isOn)
                 {
-                    SaveSelectedDifficulties(dif.minesProbability);
+                    SaveSelectedDifficulties(dif.minesProbability, dif.difficultyName);
                     ToggleChangeEvent.ToggleChanged(ToggleType.Difficulty, dif.difficultyName);
                 }
             });
         }
     }
 
-    void SaveSelectedDifficulties(float minesProbability)
+    void SaveSelectedDifficulties(float minesProbability, string difficultyName)
     {
         PlayerPrefs.SetFloat(SelectedDifficultiesKey, minesProbability);
+        PlayerPrefs.SetString(SelectedDifficultyNameKey, difficultyName);
         PlayerPrefs.Save();
     }
 
     void LoadSelectedDifficulties()
     {
-        string selectedDifficulty = PlayerPrefs.GetString(SelectedDifficultiesKey);
-        Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
-
-        foreach (Toggle toggle in toggles)
+        string selectedDifName = PlayerPrefs.GetString(SelectedDifficultyNameKey, null);
+        if (!string.IsNullOrEmpty(selectedDifName))
         {
-            if (toggle.gameObject.transform.Find("DifficultyName").GetComponent<TMP_Text>().text == selectedDifficulty)
+            Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
+            foreach (Toggle toggle in toggles)
             {
-                toggle.isOn = true;
+                TMP_Text themeNameText = toggle.GetComponentInChildren<TMP_Text>();
+                if (themeNameText != null && themeNameText.text == selectedDifName)
+                {
+                    toggle.isOn = true;
+                    break;
+                }
             }
         }
     }
