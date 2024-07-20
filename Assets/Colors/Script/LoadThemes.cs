@@ -63,6 +63,8 @@ public class LoadThemes : MonoBehaviour
     void LoadSelectedTheme()
     {
         string selectedThemeName = PlayerPrefs.GetString(SelectedThemeKey, null);
+        Debug.Log(selectedThemeName);
+
         if (!string.IsNullOrEmpty(selectedThemeName))
         {
             Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();

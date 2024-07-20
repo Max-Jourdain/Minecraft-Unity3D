@@ -52,16 +52,18 @@ public class LoadDifficulty : MonoBehaviour
     void LoadSelectedDifficulties()
     {
         string selectedDifName = PlayerPrefs.GetString(SelectedDifficultyNameKey, null);
+        Debug.Log(selectedDifName);
+
         if (!string.IsNullOrEmpty(selectedDifName))
         {
             Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
             foreach (Toggle toggle in toggles)
             {
-                TMP_Text themeNameText = toggle.GetComponentInChildren<TMP_Text>();
-                if (themeNameText != null && themeNameText.text == selectedDifName)
+                TMP_Text difNameText = toggle.GetComponentInChildren<TMP_Text>();
+                if (difNameText != null && difNameText.text == selectedDifName)
                 {
                     toggle.isOn = true;
-                    break;
+                    return; // Exit the method if a selected difficulty is found
                 }
             }
         }

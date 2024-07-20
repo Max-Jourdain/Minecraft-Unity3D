@@ -8,6 +8,21 @@ public class Settings : MonoBehaviour
     private const string Theme_SelectedToggleKey = "Theme_SelectedToggle";
     private const string Difficulty_SelectedToggleKey = "Difficulty_SelectedToggle";
 
+
+    void Start()
+    {
+        if (!PlayerPrefs.HasKey(Theme_SelectedToggleKey))
+        {
+            PlayerPrefs.SetString(Theme_SelectedToggleKey, "Retro 1");
+        }
+
+        if (!PlayerPrefs.HasKey(Difficulty_SelectedToggleKey))
+        {
+            PlayerPrefs.SetFloat("SelectedDifficulties", 11f);
+            PlayerPrefs.SetString("SelectedDifficultyName", "Easy 1");
+        }
+    }
+
     private void OnEnable()
     {
         ToggleChangeEvent.OnToggleChanged += SaveSettings;
@@ -29,7 +44,7 @@ public class Settings : MonoBehaviour
         {
             PlayerPrefs.SetString(Difficulty_SelectedToggleKey, toggleName);
         }
-        
+
         PlayerPrefs.Save();
     }
 
@@ -69,6 +84,5 @@ public static class ToggleChangeEvent
     public static void ToggleChanged(ToggleType type, string toggleName)
     {
         OnToggleChanged?.Invoke(type, toggleName);
-        Debug.Log($"Toggle changed: {toggleName}, Type: {type}");
     }
 }
