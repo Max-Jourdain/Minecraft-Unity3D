@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject pauseScreen;
     [SerializeField] private GameObject scoreScreen;
     [SerializeField] private GameObject settingsScreen;
+    [SerializeField] private GameObject restartConfirmationScreen;
+    [SerializeField] private GameObject gameOverScreen;
 
     [Header("Settings")]
     [SerializeField] private Toggle vibrationToggle;
@@ -33,6 +35,13 @@ public class GameManager : MonoBehaviour
         soundToggle.onValueChanged.AddListener(OnSoundToggleChanged);
     }
 
+    // show the Game over screen
+    public void ShowGameOverScreen()
+    {
+        gameOverScreen.SetActive(true);
+    }
+
+
     private void OnVibrationToggleChanged(bool isOn)
     {
         PlayerPrefs.SetInt(VibrationPrefKey, isOn ? 1 : 0);
@@ -45,25 +54,9 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // get state of vibration toggle
     public bool IsVibrationEnabled()
     {
         return vibrationToggle.isOn;
-    }
-
-    public void DisableScoreScreen()
-    {
-        StartCoroutine(FadeScreen(scoreScreen.GetComponent<CanvasGroup>(), 0.5f, false));
-    }
-
-    public void ShowSettings()
-    {
-        settingsScreen.gameObject.SetActive(true);
-    }
-
-    public void HideSettings()
-    {
-        settingsScreen.gameObject.SetActive(false);
     }
 
     public void LoadScene(string sceneName)
@@ -89,6 +82,13 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame()
     {
+        // if game is not over show the restart confirmation screen
+        if (!terrainModifier.isGameOver)
+        {
+            restartConfirmationScreen.SetActive(true);
+            return;
+        }
+
         Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
         Time.timeScale = 1;
 
@@ -104,23 +104,28 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoadSceneAsync());
     }
 
-    private IEnumerator FadeScreen(CanvasGroup canvasGroup, float duration, bool fadeIn)
+    // hard reset the game
+    public void HardResetGame()
     {
-        float elapsedTime = 0f;
-        float startAlpha = fadeIn ? 0f : 1f;
-        float targetAlpha = fadeIn ? 1f : 0f;
+        Block.UpdateTile(BlockType.Mine, Tile.Unplayed);
+        Time.timeScale = 1;
 
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-            canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
-            yield return null;
-        }
+        terrainModifier.hasFirstClickOccurred = false;
+        terrainModifier.isGameOver = false;
 
-        if (!fadeIn)
-        {
-            canvasGroup.gameObject.SetActive(false);
-        }
+        playerMovement.ResetPlayerPosition();
+
+        // Show the loading screen
+        loadingScreen.SetActive(true);
+        
+        // Start the loading process asynchronously
+        StartCoroutine(LoadSceneAsync());
     }
+
+    // close the restart confirmation screen
+    public void CloseRestartConfirmationScreen()
+    {
+        restartConfirmationScreen.SetActive(false);
+    }
+
 }

@@ -26,6 +26,21 @@ public class LoadDifficulty : MonoBehaviour
             GameObject themeObject = Instantiate(difficultiesPrefab, scrollViewContent);
             themeObject.transform.Find("DifficultyName").GetComponent<TMP_Text>().text = dif.difficultyName;
 
+            TMP_Text mineProbabilityText = themeObject.transform.Find("ProbText").GetComponent<TMP_Text>();
+            mineProbabilityText.text = dif.minesProbability.ToString() + "% mines" ;
+
+            // get ColorImage component and set the color
+            Image[] colorImage = themeObject.GetComponentsInChildren<Image>();
+            foreach (Image img in colorImage)
+            {
+                if (img.gameObject.name == "ColorImage")
+                {
+                    img.color = dif.color;
+                }
+            }
+
+
+
             // Assign the theme object to the ToggleGroup
             Toggle toggle = themeObject.GetComponent<Toggle>();
             toggle.group = toggleGroup.GetComponent<ToggleGroup>();

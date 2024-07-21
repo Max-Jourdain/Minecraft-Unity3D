@@ -225,9 +225,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   difficulties:
   - {fileID: 11400000, guid: d5dd96b1ef1d442d789c17b5c16c72b1, type: 2}
-  - {fileID: 11400000, guid: 542615cc7bc4d4d0f8392523b4e68317, type: 2}
-  - {fileID: 11400000, guid: a0ce76fa80bd7439e882b91d853984ea, type: 2}
-  - {fileID: 11400000, guid: 979c79ac93783498e98a10f74f2102ec, type: 2}
+  - {fileID: 11400000, guid: e4ddc4e5a955d41508b72a163475a33b, type: 2}
+  - {fileID: 11400000, guid: 8e34bcd6ee5f8403bb309a3954b0070d, type: 2}
+  - {fileID: 11400000, guid: 370c4ffb52d0b4b2a8c7c0b59d29cacf, type: 2}
+  - {fileID: 11400000, guid: 76ae6c7019bc64d57b97f61a80828f67, type: 2}
+  - {fileID: 11400000, guid: 154b89ebc0cb8481a83ea2ddece63d24, type: 2}
+  - {fileID: 11400000, guid: 7c3ae508aa2ad4a7a8353d17caec5087, type: 2}
+  - {fileID: 11400000, guid: c0c42622b05af48f9bb4ebc5929828e7, type: 2}
+  - {fileID: 11400000, guid: 65b6d15f0211846b7afcd68e1a5630f7, type: 2}
   difficultiesPrefab: {fileID: 1022713460775433949, guid: 794c06c232ddb45b298865874f1cb9e7,
     type: 3}
   scrollViewContent: {fileID: 5793808207982852259}
@@ -819,6 +824,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Popup Base - Round Light
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741952431403871611, guid: 5fe287d0e78fb4e1f87bc982c6189a5c,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741952431403871611, guid: 5fe287d0e78fb4e1f87bc982c6189a5c,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741952431403871611, guid: 5fe287d0e78fb4e1f87bc982c6189a5c,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

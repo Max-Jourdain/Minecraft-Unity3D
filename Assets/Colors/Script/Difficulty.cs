@@ -8,4 +8,5 @@ public class Difficulty : ScriptableObject
 {
     public string difficultyName;
     public int minesProbability;
+    public Color color;
 }

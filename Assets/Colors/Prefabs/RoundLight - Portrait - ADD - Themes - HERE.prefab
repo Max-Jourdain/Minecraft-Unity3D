@@ -821,6 +821,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Popup Base - Round Light
       objectReference: {fileID: 0}
+    - target: {fileID: 8741952431403871611, guid: 5fe287d0e78fb4e1f87bc982c6189a5c,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741952431403871611, guid: 5fe287d0e78fb4e1f87bc982c6189a5c,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741952431403871611, guid: 5fe287d0e78fb4e1f87bc982c6189a5c,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

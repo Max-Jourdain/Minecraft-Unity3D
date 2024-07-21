@@ -20,6 +20,7 @@ public class TerrainModifier : MonoBehaviour
 
     [Header("VFX")]
     [SerializeField] private GameObject explosionVFX;
+    [SerializeField] private GameObject flagVFX;
 
     
     [Header("Scores")]
@@ -80,45 +81,43 @@ public class TerrainModifier : MonoBehaviour
 
     private void HandleMobileInput()
     {
-        // only mask over terrain
+        // Only mask over terrain
         if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
 
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
 
-            if (touch.phase == TouchPhase.Began)
+            switch (touch.phase)
             {
-                touchStartTime = Time.time;
-                hasVibrated = false; // Reset vibration flag when a new touch begins
-            }
-            else if (touch.phase == TouchPhase.Stationary && Time.time - touchStartTime > holdThreshold && !hasVibrated)
-            {   
-                // Haptic feedback
-                if (_gameManager.IsVibrationEnabled())
-                {
-                    HapticFeedback.MediumFeedback();
-                }
+                case TouchPhase.Began:
+                    touchStartTime = Time.time;
+                    hasVibrated = false; // Reset vibration flag when a new touch begins
+                    break;
 
-                hasVibrated = true; // Ensure vibration happens only once per hold
-            }
-            else if (touch.phase == TouchPhase.Ended)
-            {
-                float touchDuration = Time.time - touchStartTime;
+                case TouchPhase.Stationary:
+                    if (Time.time - touchStartTime > holdThreshold && !hasVibrated)
+                    {
+                        // Haptic feedback
+                        if (_gameManager.IsVibrationEnabled())
+                        {
+                            HapticFeedback.MediumFeedback();
+                        }
+                        hasVibrated = true; // Ensure vibration happens only once per hold
+                    }
+                    break;
 
-                if (touchDuration < holdThreshold)
-                {
-                    RaycastAndProcess(touch.position, false); // Quick tap
-                }
-                else
-                {
-                    RaycastAndProcess(touch.position, true); // Hold
-                }
+                case TouchPhase.Ended:
+                    float touchDuration = Time.time - touchStartTime;
 
-                hasVibrated = false; // Reset for the next touch
+                    RaycastAndProcess(touch.position, touchDuration >= holdThreshold); // Process based on touch duration
+
+                    hasVibrated = false; // Reset for the next touch
+                    break;
             }
         }
     }
+
 
     private void RaycastAndProcess(Vector3 mousePosition, bool isRightClick)
     {
@@ -170,6 +169,10 @@ public class TerrainModifier : MonoBehaviour
                 originalBlockStates[blockPos] = currentBlock; // Remember the original state
                 chunk.blocks[localPos.x, localPos.y, localPos.z] = BlockType.Flag;
             }
+
+            // play flag vfx
+            Instantiate(flagVFX, hitPoint + new Vector3(0f, 0.25f, 0f), Quaternion.identity);
+
 
             chunk.BuildMesh();
         }
@@ -233,6 +236,10 @@ public class TerrainModifier : MonoBehaviour
         Block.UpdateTile(BlockType.Mine, Tile.Mine);
         yield return UpdateAllChunks(); // Update all chunks in batches
         yield return new WaitForSeconds(2);
+
+        // Show the game over screen
+        _gameManager.ShowGameOverScreen();
+
         Time.timeScale = 0;
     }
 
